@@ -55,11 +55,11 @@
    ───────────────────────────────────────────── */
 .hero-spotlight {
   --hero-spot-mul: 1;
-  --hero-spot-top: clamp(64px, 9vh, 110px);
-  --hero-spot-bar-w: clamp(300px, 42vw, 520px);
-  --hero-spot-cone-w: clamp(760px, 86vw, 1320px);
-  --hero-spot-cone-h: clamp(480px, 64vh, 740px);
-  --hero-spot-blur: 38px;
+  --hero-spot-top: clamp(60px, 8.5vh, 100px);
+  --hero-spot-bar-w: clamp(220px, 30vw, 380px);
+  --hero-spot-cone-w: clamp(560px, 64vw, 980px);
+  --hero-spot-cone-h: clamp(380px, 52vh, 600px);
+  --hero-spot-blur: 24px;
 
   position: fixed;
   inset: 0;
@@ -67,8 +67,8 @@
   z-index: 4;
 }
 
-/* Downward trapezoidal cone — Retainly-style: hot core under the bar
-   with a wide, soft trapezoidal spill that fades into black. */
+/* Soft pool of light under the lamp bar — no visible cone edges,
+   just two stacked elliptical halos that fade naturally into black. */
 .hero-spotlight::before {
   content: "";
   position: absolute;
@@ -78,25 +78,21 @@
   height: var(--hero-spot-cone-h);
   transform: translateX(-50%);
   background:
-    /* Hot core right under the lamp bar */
+    /* Tight, brighter pool right under the bar */
     radial-gradient(
-      ellipse 22% 38% at 50% 0%,
-      rgba(255, 255, 255, calc(0.5 * var(--hero-spot-mul))) 0%,
-      rgba(255, 255, 255, calc(0.22 * var(--hero-spot-mul))) 30%,
-      rgba(255, 255, 255, calc(0.06 * var(--hero-spot-mul))) 65%,
+      ellipse 26% 36% at 50% 0%,
+      rgba(255, 255, 255, calc(0.36 * var(--hero-spot-mul))) 0%,
+      rgba(255, 255, 255, calc(0.16 * var(--hero-spot-mul))) 28%,
+      rgba(255, 255, 255, calc(0.05 * var(--hero-spot-mul))) 58%,
       rgba(255, 255, 255, 0) 90%
     ),
-    /* Broad cone spill */
-    linear-gradient(
-      180deg,
-      rgba(255, 255, 255, calc(0.2 * var(--hero-spot-mul))) 0%,
-      rgba(255, 255, 255, calc(0.1 * var(--hero-spot-mul))) 28%,
-      rgba(255, 255, 255, calc(0.035 * var(--hero-spot-mul))) 60%,
-      rgba(255, 255, 255, calc(0.008 * var(--hero-spot-mul))) 82%,
-      rgba(255, 255, 255, 0) 100%
+    /* Wider soft halo for ambient spill */
+    radial-gradient(
+      ellipse 52% 68% at 50% 4%,
+      rgba(255, 255, 255, calc(0.1 * var(--hero-spot-mul))) 0%,
+      rgba(255, 255, 255, calc(0.035 * var(--hero-spot-mul))) 40%,
+      rgba(255, 255, 255, 0) 82%
     );
-  /* Trapezoid: narrow at top (matches bar), broad at bottom */
-  clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
   filter: blur(var(--hero-spot-blur));
 }
 
