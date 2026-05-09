@@ -56,10 +56,10 @@
 .hero-spotlight {
   --hero-spot-mul: 1;
   --hero-spot-top: clamp(64px, 9vh, 110px);
-  --hero-spot-bar-w: clamp(260px, 38vw, 460px);
-  --hero-spot-cone-w: clamp(620px, 78vw, 1180px);
-  --hero-spot-cone-h: clamp(420px, 58vh, 680px);
-  --hero-spot-blur: 22px;
+  --hero-spot-bar-w: clamp(300px, 42vw, 520px);
+  --hero-spot-cone-w: clamp(760px, 86vw, 1320px);
+  --hero-spot-cone-h: clamp(480px, 64vh, 740px);
+  --hero-spot-blur: 38px;
 
   position: fixed;
   inset: 0;
@@ -67,7 +67,8 @@
   z-index: 4;
 }
 
-/* Downward trapezoidal cone — illuminates the headline area */
+/* Downward trapezoidal cone — Retainly-style: hot core under the bar
+   with a wide, soft trapezoidal spill that fades into black. */
 .hero-spotlight::before {
   content: "";
   position: absolute;
@@ -77,21 +78,25 @@
   height: var(--hero-spot-cone-h);
   transform: translateX(-50%);
   background:
+    /* Hot core right under the lamp bar */
+    radial-gradient(
+      ellipse 22% 38% at 50% 0%,
+      rgba(255, 255, 255, calc(0.5 * var(--hero-spot-mul))) 0%,
+      rgba(255, 255, 255, calc(0.22 * var(--hero-spot-mul))) 30%,
+      rgba(255, 255, 255, calc(0.06 * var(--hero-spot-mul))) 65%,
+      rgba(255, 255, 255, 0) 90%
+    ),
+    /* Broad cone spill */
     linear-gradient(
       180deg,
-      rgba(255, 255, 255, calc(0.32 * var(--hero-spot-mul))) 0%,
-      rgba(255, 255, 255, calc(0.18 * var(--hero-spot-mul))) 18%,
-      rgba(255, 255, 255, calc(0.08 * var(--hero-spot-mul))) 45%,
-      rgba(255, 255, 255, calc(0.025 * var(--hero-spot-mul))) 75%,
+      rgba(255, 255, 255, calc(0.2 * var(--hero-spot-mul))) 0%,
+      rgba(255, 255, 255, calc(0.1 * var(--hero-spot-mul))) 28%,
+      rgba(255, 255, 255, calc(0.035 * var(--hero-spot-mul))) 60%,
+      rgba(255, 255, 255, calc(0.008 * var(--hero-spot-mul))) 82%,
       rgba(255, 255, 255, 0) 100%
-    ),
-    radial-gradient(
-      ellipse 26% 55% at 50% 0%,
-      rgba(255, 255, 255, calc(0.22 * var(--hero-spot-mul))) 0%,
-      rgba(255, 255, 255, 0) 70%
     );
-  /* Trapezoid: top narrow (≈ bar width inside cone), bottom wide */
-  clip-path: polygon(38% 0%, 62% 0%, 100% 100%, 0% 100%);
+  /* Trapezoid: narrow at top (matches bar), broad at bottom */
+  clip-path: polygon(40% 0%, 60% 0%, 100% 100%, 0% 100%);
   filter: blur(var(--hero-spot-blur));
 }
 
@@ -102,33 +107,33 @@
   top: var(--hero-spot-top);
   left: 50%;
   width: var(--hero-spot-bar-w);
-  height: 4px;
-  border-radius: 2px;
+  height: 5px;
+  border-radius: 3px;
   transform: translate(-50%, -50%);
   background:
     radial-gradient(
       circle at 0% 50%,
       rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 0) 28%
+      rgba(255, 255, 255, 0) 26%
     ),
     radial-gradient(
       circle at 100% 50%,
       rgba(255, 255, 255, 1) 0%,
-      rgba(255, 255, 255, 0) 28%
+      rgba(255, 255, 255, 0) 26%
     ),
     linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0.7) 0%,
+      rgba(255, 255, 255, 0.75) 0%,
       rgba(255, 255, 255, 0.98) 12%,
       rgba(255, 255, 255, 1) 50%,
       rgba(255, 255, 255, 0.98) 88%,
-      rgba(255, 255, 255, 0.7) 100%
+      rgba(255, 255, 255, 0.75) 100%
     );
   box-shadow:
-    0 0 4px rgba(255, 255, 255, calc(0.85 * var(--hero-spot-mul))),
-    0 0 14px rgba(255, 255, 255, calc(0.55 * var(--hero-spot-mul))),
-    0 0 36px rgba(255, 255, 255, calc(0.32 * var(--hero-spot-mul))),
-    0 0 80px rgba(255, 255, 255, calc(0.16 * var(--hero-spot-mul)));
+    0 0 5px rgba(255, 255, 255, calc(0.9 * var(--hero-spot-mul))),
+    0 0 18px rgba(255, 255, 255, calc(0.6 * var(--hero-spot-mul))),
+    0 0 44px rgba(255, 255, 255, calc(0.36 * var(--hero-spot-mul))),
+    0 0 100px rgba(255, 255, 255, calc(0.18 * var(--hero-spot-mul)));
 }
 
 /* ─────────────────────────────────────────────
@@ -171,12 +176,37 @@
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.22;
+  opacity: 0.28;
+  mix-blend-mode: screen;
+}
+
+/* Diffused grid lines */
+.streaks::before {
+  content: "";
+  position: absolute;
+  inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 120px 120px;
-  mix-blend-mode: overlay;
+  filter: blur(1.2px);
+  opacity: 0.5;
+}
+
+/* Brighter intersection points */
+.streaks::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.34) 0 1.3px,
+    rgba(255, 255, 255, 0.18) 1.3px 2px,
+    transparent 2.4px
+  );
+  background-size: 120px 120px;
+  filter: blur(0.6px);
+  opacity: 0.65;
 }
 
 .vignette {

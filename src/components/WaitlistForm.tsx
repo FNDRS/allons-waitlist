@@ -149,7 +149,7 @@ export function WaitlistForm({
         className={
           "relative w-full h-14 rounded-full flex items-center pr-2 pl-6 " +
           (isDark
-            ? "bg-[#1b1b1b] border border-white/12"
+            ? "bg-transparent border border-white/16"
             : "bg-white border border-black/8 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.25)]")
         }
       >

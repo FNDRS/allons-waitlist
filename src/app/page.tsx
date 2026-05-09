@@ -26,7 +26,7 @@ export default function HomePage() {
             exclusiva para descubrir, gestionar y entrar a eventos en Honduras.
           </p>
           <section id="lista" className="fade-up delay-5 mt-9 w-full max-w-2xl">
-            <div className="rounded-[28px] border border-white/10 bg-black/80 p-3 shadow-[0_30px_100px_-45px_rgba(246,112,16,0.72),inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <div className="rounded-[28px] border border-white/10 bg-transparent p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               <Suspense
                 fallback={
                   <div className="h-14 w-full rounded-full bg-[#1b1b1b]" />
