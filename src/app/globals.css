@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #000000;
+  --color-bg: #050505;
   --color-fg: #ffffff;
   --color-muted: rgba(255, 255, 255, 0.55);
-  --color-border: rgba(255, 255, 255, 0.1);
-  --color-pill-bg: #ffffff;
-  --color-pill-fg: #000000;
+  --color-dim: rgba(255, 255, 255, 0.3);
+  --color-faint: rgba(255, 255, 255, 0.12);
+  --color-border: rgba(255, 255, 255, 0.08);
   --color-accent: #f67010;
+  --color-accent-deep: #c8420a;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -30,5 +31,229 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    overflow-x: hidden;
   }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: #000;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Hero — Retainly-style top spotlight
+   Anatomy: a bright horizontal lamp bar (::after) that sits ~80px
+   below the top, mounted on the dark wall, and a soft trapezoidal
+   cone (::before) of light spilling straight down onto the headline.
+   Tweak:
+     --hero-spot-mul   → master multiplier
+     --hero-spot-top   → distance from top to the lamp bar
+     --hero-spot-bar-w → lamp bar width
+     --hero-spot-cone-w/h → cone bottom width / height
+     --hero-spot-blur  → cone edge softness
+   Sits at z:4 (above vignette/grain) but under content (z:10).
+   ───────────────────────────────────────────── */
+.hero-spotlight {
+  --hero-spot-mul: 1;
+  --hero-spot-top: clamp(64px, 9vh, 110px);
+  --hero-spot-bar-w: clamp(260px, 38vw, 460px);
+  --hero-spot-cone-w: clamp(620px, 78vw, 1180px);
+  --hero-spot-cone-h: clamp(420px, 58vh, 680px);
+  --hero-spot-blur: 22px;
+
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Downward trapezoidal cone — illuminates the headline area */
+.hero-spotlight::before {
+  content: "";
+  position: absolute;
+  top: var(--hero-spot-top);
+  left: 50%;
+  width: var(--hero-spot-cone-w);
+  height: var(--hero-spot-cone-h);
+  transform: translateX(-50%);
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, calc(0.32 * var(--hero-spot-mul))) 0%,
+      rgba(255, 255, 255, calc(0.18 * var(--hero-spot-mul))) 18%,
+      rgba(255, 255, 255, calc(0.08 * var(--hero-spot-mul))) 45%,
+      rgba(255, 255, 255, calc(0.025 * var(--hero-spot-mul))) 75%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    radial-gradient(
+      ellipse 26% 55% at 50% 0%,
+      rgba(255, 255, 255, calc(0.22 * var(--hero-spot-mul))) 0%,
+      rgba(255, 255, 255, 0) 70%
+    );
+  /* Trapezoid: top narrow (≈ bar width inside cone), bottom wide */
+  clip-path: polygon(38% 0%, 62% 0%, 100% 100%, 0% 100%);
+  filter: blur(var(--hero-spot-blur));
+}
+
+/* The lamp bar itself — bright, defined, with luminaire caps */
+.hero-spotlight::after {
+  content: "";
+  position: absolute;
+  top: var(--hero-spot-top);
+  left: 50%;
+  width: var(--hero-spot-bar-w);
+  height: 4px;
+  border-radius: 2px;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(
+      circle at 0% 50%,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0) 28%
+    ),
+    radial-gradient(
+      circle at 100% 50%,
+      rgba(255, 255, 255, 1) 0%,
+      rgba(255, 255, 255, 0) 28%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.7) 0%,
+      rgba(255, 255, 255, 0.98) 12%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.98) 88%,
+      rgba(255, 255, 255, 0.7) 100%
+    );
+  box-shadow:
+    0 0 4px rgba(255, 255, 255, calc(0.85 * var(--hero-spot-mul))),
+    0 0 14px rgba(255, 255, 255, calc(0.55 * var(--hero-spot-mul))),
+    0 0 36px rgba(255, 255, 255, calc(0.32 * var(--hero-spot-mul))),
+    0 0 80px rgba(255, 255, 255, calc(0.16 * var(--hero-spot-mul)));
+}
+
+/* ─────────────────────────────────────────────
+   Ambient — warm stage glow (below hero spotlight)
+   ───────────────────────────────────────────── */
+
+.ambient {
+  position: fixed;
+  top: 56%;
+  left: 50%;
+  width: 880px;
+  height: 880px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(246, 112, 16, 0.08) 0%,
+    rgba(246, 112, 16, 0.025) 38%,
+    rgba(246, 112, 16, 0) 68%
+  );
+  filter: blur(70px);
+  animation: breathe 12s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.08);
+    opacity: 1;
+  }
+}
+
+.streaks {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mix-blend-mode: overlay;
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, #000 100%),
+    radial-gradient(ellipse at center, transparent 42%, rgba(0, 0, 0, 0.86) 100%);
+  z-index: 2;
+}
+
+/* Subtle grain */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  z-index: 3;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.7'/></svg>");
+}
+
+/* ─────────────────────────────────────────────
+   Animations
+   ───────────────────────────────────────────── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-up {
+  opacity: 0;
+  animation: fade-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.28s; }
+.delay-3 { animation-delay: 0.5s; }
+.delay-4 { animation-delay: 0.74s; }
+.delay-5 { animation-delay: 1s; }
+.delay-6 { animation-delay: 1.3s; }
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.pulse-dot {
+  animation: pulse-dot 2.6s ease-in-out infinite;
+}
+
+/* Modal */
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-overlay { animation: overlay-in 0.25s ease-out forwards; }
+.modal-card    { animation: modal-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* Subtle highlight sweep on the CTA */
+@keyframes sweep {
+  0% { transform: translateX(-150%); }
+  100% { transform: translateX(150%); }
+}
+
+.sweep {
+  animation: sweep 4.5s ease-in-out infinite;
 }

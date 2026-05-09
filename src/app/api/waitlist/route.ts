@@ -2,9 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SOURCE_RE = /^[a-z0-9][a-z0-9-_]{0,40}$/i;
+
+export async function GET() {
+  try {
+    const supabase = getSupabaseAdmin();
+    const { count, error } = await supabase
+      .from("waitlist")
+      .select("*", { count: "exact", head: true });
+    if (error) throw error;
+    return NextResponse.json({ count: count ?? 0 });
+  } catch {
+    return NextResponse.json({ count: 0 });
+  }
+}
 
 export async function POST(req: NextRequest) {
   let body: { email?: unknown; source?: unknown };
@@ -30,17 +44,10 @@ export async function POST(req: NextRequest) {
     null;
 
   const supabase = getSupabaseAdmin();
-  const row = {
-    email,
-    source,
-    user_agent: userAgent,
-    referer,
-    ip,
-  };
+  const row = { email, source, user_agent: userAgent, referer, ip };
   const { error } = await supabase.from("waitlist").insert(row as never);
 
   if (error) {
-    // Treat duplicate gracefully — user is already on the list.
     if (error.code === "23505") {
       return NextResponse.json({ ok: true, duplicate: true });
     }
