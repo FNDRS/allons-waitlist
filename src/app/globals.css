@@ -57,9 +57,9 @@
   --hero-spot-mul: 1;
   --hero-spot-top: clamp(60px, 8.5vh, 100px);
   --hero-spot-bar-w: clamp(220px, 30vw, 380px);
-  --hero-spot-cone-w: clamp(560px, 64vw, 980px);
-  --hero-spot-cone-h: clamp(380px, 52vh, 600px);
-  --hero-spot-blur: 24px;
+  --hero-spot-cone-w: clamp(820px, 95vw, 1480px);
+  --hero-spot-cone-h: clamp(540px, 72vh, 860px);
+  --hero-spot-blur: 28px;
 
   position: fixed;
   inset: 0;
@@ -68,7 +68,7 @@
 }
 
 /* Soft pool of light under the lamp bar — no visible cone edges,
-   just two stacked elliptical halos that fade naturally into black. */
+   just stacked elliptical halos that fade naturally into black. */
 .hero-spotlight::before {
   content: "";
   position: absolute;
@@ -80,18 +80,25 @@
   background:
     /* Tight, brighter pool right under the bar */
     radial-gradient(
-      ellipse 26% 36% at 50% 0%,
-      rgba(255, 255, 255, calc(0.36 * var(--hero-spot-mul))) 0%,
-      rgba(255, 255, 255, calc(0.16 * var(--hero-spot-mul))) 28%,
-      rgba(255, 255, 255, calc(0.05 * var(--hero-spot-mul))) 58%,
-      rgba(255, 255, 255, 0) 90%
+      ellipse 24% 32% at 50% 0%,
+      rgba(255, 255, 255, calc(0.4 * var(--hero-spot-mul))) 0%,
+      rgba(255, 255, 255, calc(0.18 * var(--hero-spot-mul))) 28%,
+      rgba(255, 255, 255, calc(0.06 * var(--hero-spot-mul))) 58%,
+      rgba(255, 255, 255, 0) 92%
     ),
-    /* Wider soft halo for ambient spill */
+    /* Wider mid halo */
     radial-gradient(
-      ellipse 52% 68% at 50% 4%,
-      rgba(255, 255, 255, calc(0.1 * var(--hero-spot-mul))) 0%,
-      rgba(255, 255, 255, calc(0.035 * var(--hero-spot-mul))) 40%,
+      ellipse 55% 72% at 50% 2%,
+      rgba(255, 255, 255, calc(0.13 * var(--hero-spot-mul))) 0%,
+      rgba(255, 255, 255, calc(0.05 * var(--hero-spot-mul))) 40%,
       rgba(255, 255, 255, 0) 82%
+    ),
+    /* Far ambient spill so the light reaches further out */
+    radial-gradient(
+      ellipse 90% 100% at 50% 8%,
+      rgba(255, 255, 255, calc(0.05 * var(--hero-spot-mul))) 0%,
+      rgba(255, 255, 255, calc(0.018 * var(--hero-spot-mul))) 45%,
+      rgba(255, 255, 255, 0) 88%
     );
   filter: blur(var(--hero-spot-blur));
 }
