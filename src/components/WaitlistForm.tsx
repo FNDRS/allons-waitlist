@@ -2,8 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import confetti from "canvas-confetti";
+import { WAITLIST_BASE_SUBSCRIBERS } from "@/lib/waitlist-count";
 
 type Status = "idle" | "loading" | "success" | "error";
+
+interface WaitlistSubmitResponse {
+  ok?: boolean;
+  duplicate?: boolean;
+  totalSubscribers?: number;
+  error?: string;
+}
 
 interface Props {
   /** Visual style for the form pill. */
@@ -29,7 +38,10 @@ export function WaitlistForm({
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successTotal, setSuccessTotal] = useState<number>(WAITLIST_BASE_SUBSCRIBERS);
+  const [animatedSuccessTotal, setAnimatedSuccessTotal] = useState<number>(WAITLIST_BASE_SUBSCRIBERS);
   const inputRef = useRef<HTMLInputElement>(null);
+  const successAnimRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (step === "email" && (autoFocus || !expanded)) {
@@ -54,30 +66,97 @@ export function WaitlistForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: trimmed, source }),
       });
-      const data = await res.json().catch(() => ({}));
+      const data: WaitlistSubmitResponse = await res.json().catch(() => ({}));
       if (!res.ok) {
         throw new Error(data?.error || "Algo salió mal. Inténtalo de nuevo.");
       }
+      if (typeof data.totalSubscribers === "number") {
+        setSuccessTotal(Math.max(WAITLIST_BASE_SUBSCRIBERS, data.totalSubscribers));
+      }
       setStatus("success");
       // Let other components (e.g. SocialProof) react/refresh.
-      window.dispatchEvent(new CustomEvent("waitlist:signup"));
+      window.dispatchEvent(
+        new CustomEvent("waitlist:signup", {
+          detail: {
+            email: trimmed,
+            duplicate: Boolean(data.duplicate),
+            totalSubscribers:
+              typeof data.totalSubscribers === "number"
+                ? data.totalSubscribers
+                : undefined,
+          },
+        }),
+      );
     } catch (err) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Error inesperado");
     }
   };
 
+  useEffect(() => {
+    if (status !== "success") return;
+
+    const durationMs = 1400;
+    const interval = window.setInterval(() => {
+      const spread = 70;
+      const ticks = 160;
+      confetti({
+        particleCount: 3,
+        angle: 60,
+        spread,
+        origin: { x: 0, y: 0.6 },
+        ticks,
+        colors: ["#10B981", "#34D399", "#6EE7B7", "#FFFFFF"],
+      });
+      confetti({
+        particleCount: 3,
+        angle: 120,
+        spread,
+        origin: { x: 1, y: 0.6 },
+        ticks,
+        colors: ["#10B981", "#34D399", "#6EE7B7", "#FFFFFF"],
+      });
+    }, 180);
+
+    window.setTimeout(() => window.clearInterval(interval), durationMs);
+    return () => window.clearInterval(interval);
+  }, [status]);
+
+  useEffect(() => {
+    if (status !== "success") return;
+    if (successAnimRef.current) window.cancelAnimationFrame(successAnimRef.current);
+
+    const from = WAITLIST_BASE_SUBSCRIBERS;
+    const to = Math.max(WAITLIST_BASE_SUBSCRIBERS, successTotal);
+    const durationMs = 1300;
+    const start = performance.now();
+
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setAnimatedSuccessTotal(Math.round(from + (to - from) * eased));
+      if (t < 1) {
+        successAnimRef.current = window.requestAnimationFrame(tick);
+      }
+    };
+
+    successAnimRef.current = window.requestAnimationFrame(tick);
+    return () => {
+      if (successAnimRef.current) window.cancelAnimationFrame(successAnimRef.current);
+    };
+  }, [status, successTotal]);
+
   const isDark = variant === "dark";
 
   if (status === "success") {
     return (
-      <div className="w-full flex flex-col items-center gap-3">
+      <div className="w-full flex flex-col items-center gap-3 rounded-[28px] border border-emerald-400/30 bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.25),rgba(5,15,13,0.75)_42%,rgba(8,8,10,0.98)_100%)] px-4 py-5 shadow-[0_0_0_1px_rgba(16,185,129,0.05),0_20px_80px_-35px_rgba(16,185,129,0.65)]">
         <div
           className={
-            "w-full h-14 rounded-full flex items-center justify-center gap-2 " +
+            "w-full h-14 rounded-full flex items-center justify-center gap-2 backdrop-blur-sm " +
             (isDark
-              ? "bg-emerald-500/15 border border-emerald-400/40"
-              : "bg-emerald-500/10 border border-emerald-500/30")
+              ? "bg-emerald-500/20 border border-emerald-300/45"
+              : "bg-emerald-500/15 border border-emerald-500/35")
           }
         >
           <CheckIcon />
@@ -88,6 +167,24 @@ export function WaitlistForm({
           >
             Estás dentro
           </span>
+        </div>
+        <div className="flex flex-col items-center">
+          <p
+            className={
+              "text-[11px] uppercase tracking-[0.22em] " +
+              (isDark ? "text-emerald-200/70" : "text-emerald-700/70")
+            }
+          >
+            Personas suscritas
+          </p>
+          <p
+            className={
+              "mt-1 text-[30px] font-semibold leading-none tabular-nums " +
+              (isDark ? "text-white" : "text-black")
+            }
+          >
+            {animatedSuccessTotal.toLocaleString("es-HN")}
+          </p>
         </div>
         <p
           className={

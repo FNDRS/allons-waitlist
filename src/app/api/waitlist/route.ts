@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { WAITLIST_BASE_SUBSCRIBERS } from "@/lib/waitlist-count";
+import { getWaitlistTotals } from "@/lib/waitlist-count.server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -9,14 +11,17 @@ const SOURCE_RE = /^[a-z0-9][a-z0-9-_]{0,40}$/i;
 
 export async function GET() {
   try {
-    const supabase = getSupabaseAdmin();
-    const { count, error } = await supabase
-      .from("waitlist")
-      .select("*", { count: "exact", head: true });
-    if (error) throw error;
-    return NextResponse.json({ count: count ?? 0 });
-  } catch {
-    return NextResponse.json({ count: 0 });
+    const totals = await getWaitlistTotals();
+    return NextResponse.json({
+      count: totals.dbCount,
+      totalSubscribers: totals.totalSubscribers,
+    });
+  } catch (err) {
+    console.error("[waitlist] count error", err);
+    return NextResponse.json({
+      count: 0,
+      totalSubscribers: WAITLIST_BASE_SUBSCRIBERS,
+    });
   }
 }
 
@@ -49,14 +54,56 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     if (error.code === "23505") {
-      return NextResponse.json({ ok: true, duplicate: true });
+      try {
+        const totals = await getWaitlistTotals();
+        return NextResponse.json({
+          ok: true,
+          duplicate: true,
+          count: totals.dbCount,
+          totalSubscribers: totals.totalSubscribers,
+        });
+      } catch (countErr) {
+        console.error("[waitlist] duplicate count error", countErr);
+        return NextResponse.json({
+          ok: true,
+          duplicate: true,
+          count: 0,
+          totalSubscribers: WAITLIST_BASE_SUBSCRIBERS,
+        });
+      }
     }
     console.error("[waitlist] insert error", error);
+    if (process.env.NODE_ENV !== "production") {
+      return NextResponse.json(
+        {
+          error: "Insert failed",
+          code: error.code,
+          message: error.message,
+          details: (error as unknown as { details?: string }).details,
+          hint: (error as unknown as { hint?: string }).hint,
+        },
+        { status: 500 },
+      );
+    }
     return NextResponse.json(
       { error: "No se pudo registrar. Inténtalo de nuevo." },
       { status: 500 },
     );
   }
 
-  return NextResponse.json({ ok: true });
+  try {
+    const totals = await getWaitlistTotals();
+    return NextResponse.json({
+      ok: true,
+      count: totals.dbCount,
+      totalSubscribers: totals.totalSubscribers,
+    });
+  } catch (countErr) {
+    console.error("[waitlist] post count error", countErr);
+    return NextResponse.json({
+      ok: true,
+      count: 0,
+      totalSubscribers: WAITLIST_BASE_SUBSCRIBERS,
+    });
+  }
 }

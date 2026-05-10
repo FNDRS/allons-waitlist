@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-
-const FALLBACK_COUNT = 320;
-const COUNT_OFFSET = 247;
+import { WAITLIST_BASE_SUBSCRIBERS } from "@/lib/waitlist-count";
 
 const avatars = [
   { initials: "AM", color: "from-orange-500 to-amber-300" },
@@ -13,10 +11,26 @@ const avatars = [
   { initials: "+", color: "from-white to-neutral-500" },
 ];
 
+function initialsFromEmail(email: string) {
+  const local = email.split("@")[0] ?? "";
+  const parts = local
+    .split(/[^a-z0-9]+/i)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
+  const compact = (parts[0] ?? local).replace(/[^a-z0-9]/gi, "");
+  return (compact.slice(0, 2) || "+").toUpperCase();
+}
+
 export function SocialProof() {
-  const [count, setCount] = useState<number>(FALLBACK_COUNT);
+  const [count, setCount] = useState<number>(WAITLIST_BASE_SUBSCRIBERS);
   const [displayCount, setDisplayCount] = useState<number>(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [latestInitials, setLatestInitials] = useState<string>("+");
   const animRef = useRef<number | null>(null);
   const displayRef = useRef<number>(0);
   const hasAnimatedOnceRef = useRef(false);
@@ -24,7 +38,7 @@ export function SocialProof() {
   const animateTo = (next: number) => {
     if (animRef.current) window.cancelAnimationFrame(animRef.current);
     const from = displayRef.current;
-    const to = Math.max(FALLBACK_COUNT, next);
+    const to = Math.max(WAITLIST_BASE_SUBSCRIBERS, next);
     const durationMs = 2600;
     const start = performance.now();
 
@@ -52,11 +66,13 @@ export function SocialProof() {
     let cancelled = false;
 
     const refresh = () => {
-      fetch("/api/waitlist", { method: "GET" })
+      fetch("/api/waitlist/count", { method: "GET" })
         .then((response) => response.json())
         .then((data) => {
-          if (!cancelled && typeof data?.count === "number") {
-            setCount(Math.max(FALLBACK_COUNT, data.count + COUNT_OFFSET));
+          if (!cancelled && typeof data?.totalSubscribers === "number") {
+            setCount(
+              Math.max(WAITLIST_BASE_SUBSCRIBERS, data.totalSubscribers),
+            );
           }
         })
         .catch(() => {});
@@ -64,12 +80,30 @@ export function SocialProof() {
 
     refresh();
 
-    const onSignup = () => refresh();
-    window.addEventListener("waitlist:signup", onSignup);
+    const onSignup = (event: Event) => {
+      const detail = (
+        event as CustomEvent<{
+          email?: string;
+          totalSubscribers?: number;
+          duplicate?: boolean;
+        }>
+      ).detail;
+
+      // Optimistic UI: if backend returns total, use it; otherwise bump once.
+      if (typeof detail?.totalSubscribers === "number") {
+        setCount(Math.max(WAITLIST_BASE_SUBSCRIBERS, detail.totalSubscribers));
+      } else if (!detail?.duplicate) {
+        setCount((prev) => prev + 1);
+      }
+
+      if (detail?.email) setLatestInitials(initialsFromEmail(detail.email));
+      refresh();
+    };
+    window.addEventListener("waitlist:signup", onSignup as EventListener);
 
     return () => {
       cancelled = true;
-      window.removeEventListener("waitlist:signup", onSignup);
+      window.removeEventListener("waitlist:signup", onSignup as EventListener);
       if (animRef.current) window.cancelAnimationFrame(animRef.current);
     };
   }, []);
@@ -88,14 +122,18 @@ export function SocialProof() {
   return (
     <div className="fade-up delay-5 mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
       <div className="flex" aria-hidden>
-        {avatars.map((avatar, index) => (
+        {avatars.map((avatar, index) => {
+          const initials =
+            index === avatars.length - 1 ? latestInitials : avatar.initials;
+          return (
           <div
-            key={avatar.initials}
+            key={`${avatar.initials}-${index}`}
             className={`grid size-10 place-items-center rounded-full border-2 border-black bg-gradient-to-br ${avatar.color} text-[11px] font-bold text-black shadow-[0_8px_28px_rgba(0,0,0,0.45)] ${index === 0 ? "" : "-ml-3"}`}
           >
-            {avatar.initials}
+            {initials}
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <p className="text-sm text-white/58">
@@ -108,7 +146,7 @@ export function SocialProof() {
         >
           {displayCount.toLocaleString("es-HN")}
         </span>{" "}
-        personas en la lista.
+        personas suscritas.
       </p>
     </div>
   );
