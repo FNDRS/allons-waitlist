@@ -16,6 +16,7 @@ const avatars = [
 export function SocialProof() {
   const [count, setCount] = useState<number>(FALLBACK_COUNT);
   const [displayCount, setDisplayCount] = useState<number>(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   const animRef = useRef<number | null>(null);
   const displayRef = useRef<number>(0);
   const hasAnimatedOnceRef = useRef(false);
@@ -24,8 +25,11 @@ export function SocialProof() {
     if (animRef.current) window.cancelAnimationFrame(animRef.current);
     const from = displayRef.current;
     const to = Math.max(FALLBACK_COUNT, next);
-    const durationMs = 1400;
+    const durationMs = 2600;
     const start = performance.now();
+
+    // Only do the “big number” effect if there is something to animate.
+    setIsAnimating(from !== to);
 
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / durationMs);
@@ -34,7 +38,11 @@ export function SocialProof() {
       const value = Math.round(from + (to - from) * eased);
       displayRef.current = value;
       setDisplayCount(value);
-      if (t < 1) animRef.current = window.requestAnimationFrame(tick);
+      if (t < 1) {
+        animRef.current = window.requestAnimationFrame(tick);
+      } else {
+        setIsAnimating(false);
+      }
     };
 
     animRef.current = window.requestAnimationFrame(tick);
@@ -92,7 +100,12 @@ export function SocialProof() {
 
       <p className="text-sm text-white/58">
         Únete a más de{" "}
-        <span className="font-semibold text-white tabular-nums">
+        <span
+          className={
+            "font-semibold text-white tabular-nums transition-all duration-500 ease-out " +
+            (isAnimating ? "text-[20px] sm:text-[22px]" : "text-[16px]")
+          }
+        >
           {displayCount.toLocaleString("es-HN")}
         </span>{" "}
         personas en la lista.

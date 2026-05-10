@@ -84,7 +84,7 @@
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100svh;
+  height: 130svh;
   pointer-events: none;
   z-index: 4;
   overflow: hidden;
@@ -93,7 +93,7 @@
 .hero-sticky-layer {
   position: absolute;
   inset: 0 0 auto 0;
-  height: 100svh;
+  height: 130svh;
   z-index: 30;
   pointer-events: none;
   will-change: transform, opacity;
@@ -121,25 +121,24 @@
     ),
     /* Mid halo — extended downward */
     radial-gradient(
-      ellipse 52% 80% at 50% 4%,
-      rgba(255, 255, 255, calc(0.14 * var(--hero-spot-mul))) 0%,
-      rgba(255, 255, 255, calc(0.055 * var(--hero-spot-mul))) 42%,
-      rgba(255, 255, 255, 0) 86%
-    ),
-    /* Subtle wide bottom halo — hints at /---\ shape */
-    radial-gradient(
-      ellipse 84% 50% at 50% 95%,
-      rgba(255, 255, 255, calc(0.055 * var(--hero-spot-mul))) 0%,
-      rgba(255, 255, 255, calc(0.024 * var(--hero-spot-mul))) 38%,
-      rgba(255, 255, 255, 0) 82%
-    ),
+        ellipse 52% 80% at 50% 4%,
+        rgba(255, 255, 255, calc(0.14 * var(--hero-spot-mul))) 0%,
+        rgba(255, 255, 255, calc(0.055 * var(--hero-spot-mul))) 42%,
+        rgba(255, 255, 255, 0) 86%
+      ),
+    /* Subtle wide bottom halo — hints at /---\ shape */radial-gradient(
+        ellipse 84% 50% at 50% 95%,
+        rgba(255, 255, 255, calc(0.055 * var(--hero-spot-mul))) 0%,
+        rgba(255, 255, 255, calc(0.024 * var(--hero-spot-mul))) 38%,
+        rgba(255, 255, 255, 0) 82%
+      ),
     /* Far ambient spill — reaches deep down */
     radial-gradient(
-      ellipse 105% 130% at 50% 18%,
-      rgba(255, 255, 255, calc(0.055 * var(--hero-spot-mul))) 0%,
-      rgba(255, 255, 255, calc(0.022 * var(--hero-spot-mul))) 50%,
-      rgba(255, 255, 255, 0) 92%
-    );
+        ellipse 105% 130% at 50% 18%,
+        rgba(255, 255, 255, calc(0.055 * var(--hero-spot-mul))) 0%,
+        rgba(255, 255, 255, calc(0.022 * var(--hero-spot-mul))) 50%,
+        rgba(255, 255, 255, 0) 92%
+      );
   filter: blur(var(--hero-spot-blur));
   transform-origin: 50% 0%;
   animation:
@@ -148,7 +147,8 @@
 }
 
 @keyframes spotlight-breathe {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.78;
     filter: blur(var(--hero-spot-blur));
   }
@@ -167,7 +167,8 @@
 }
 
 @keyframes spotlight-sway {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(-50%) scale(1) skewX(0deg);
   }
   25% {
@@ -219,22 +220,70 @@
 }
 
 @keyframes lamp-flicker {
-  0%   { opacity: 1;    filter: brightness(1); }
-  6%   { opacity: 0.78; filter: brightness(0.85); }
-  9%   { opacity: 1;    filter: brightness(1.08); }
-  14%  { opacity: 0.92; filter: brightness(0.95); }
-  17%  { opacity: 1;    filter: brightness(1); }
-  31%  { opacity: 1;    filter: brightness(1); }
-  34%  { opacity: 0.65; filter: brightness(0.7); }
-  36%  { opacity: 1;    filter: brightness(1.12); }
-  41%  { opacity: 0.95; filter: brightness(0.98); }
-  46%  { opacity: 1;    filter: brightness(1); }
-  68%  { opacity: 1;    filter: brightness(1); }
-  71%  { opacity: 0.84; filter: brightness(0.9); }
-  73%  { opacity: 1;    filter: brightness(1.05); }
-  88%  { opacity: 0.93; filter: brightness(0.96); }
-  92%  { opacity: 1;    filter: brightness(1); }
-  100% { opacity: 1;    filter: brightness(1); }
+  0% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  6% {
+    opacity: 0.78;
+    filter: brightness(0.85);
+  }
+  9% {
+    opacity: 1;
+    filter: brightness(1.08);
+  }
+  14% {
+    opacity: 0.92;
+    filter: brightness(0.95);
+  }
+  17% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  31% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  34% {
+    opacity: 0.65;
+    filter: brightness(0.7);
+  }
+  36% {
+    opacity: 1;
+    filter: brightness(1.12);
+  }
+  41% {
+    opacity: 0.95;
+    filter: brightness(0.98);
+  }
+  46% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  68% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  71% {
+    opacity: 0.84;
+    filter: brightness(0.9);
+  }
+  73% {
+    opacity: 1;
+    filter: brightness(1.05);
+  }
+  88% {
+    opacity: 0.93;
+    filter: brightness(0.96);
+  }
+  92% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
 }
 
 /* ─────────────────────────────────────────────
@@ -262,7 +311,8 @@
 }
 
 @keyframes breathe {
-  0%, 100% {
+  0%,
+  100% {
     transform: translate(-50%, -50%) scale(1);
     opacity: 0.85;
   }
@@ -343,16 +393,35 @@
   animation: fade-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.delay-1 { animation-delay: 0.1s; }
-.delay-2 { animation-delay: 0.28s; }
-.delay-3 { animation-delay: 0.5s; }
-.delay-4 { animation-delay: 0.74s; }
-.delay-5 { animation-delay: 1s; }
-.delay-6 { animation-delay: 1.3s; }
+.delay-1 {
+  animation-delay: 0.1s;
+}
+.delay-2 {
+  animation-delay: 0.28s;
+}
+.delay-3 {
+  animation-delay: 0.5s;
+}
+.delay-4 {
+  animation-delay: 0.74s;
+}
+.delay-5 {
+  animation-delay: 1s;
+}
+.delay-6 {
+  animation-delay: 1.3s;
+}
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
 }
 
 .pulse-dot {
@@ -361,21 +430,39 @@
 
 /* Modal */
 @keyframes modal-in {
-  from { opacity: 0; transform: translateY(8px) scale(0.98); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 @keyframes overlay-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
-.modal-overlay { animation: overlay-in 0.25s ease-out forwards; }
-.modal-card    { animation: modal-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.modal-overlay {
+  animation: overlay-in 0.25s ease-out forwards;
+}
+.modal-card {
+  animation: modal-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
 
 /* Subtle highlight sweep on the CTA */
 @keyframes sweep {
-  0% { transform: translateX(-150%); }
-  100% { transform: translateX(150%); }
+  0% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateX(150%);
+  }
 }
 
 .sweep {

@@ -29,7 +29,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     title: "Allons — Lista de espera",
-    description: "Acceso anticipado a la nueva experiencia de eventos en Honduras.",
+    description:
+      "Acceso anticipado a la nueva experiencia de eventos en Honduras.",
     images: ["https://allonsapp.com/opengraph-image"],
   },
 };
@@ -43,8 +44,8 @@ export default function HomePage() {
       <div className="vignette" aria-hidden />
       <div className="grain" aria-hidden />
 
-      <div className="relative z-10 flex min-h-screen flex-col pt-16 sm:pt-20">
-        <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-5 pb-12 pt-10 text-center sm:px-8 sm:pb-16 sm:pt-14">
+      <div className="relative z-10 flex flex-col pt-16 sm:pt-20">
+        <main className="mx-auto flex w-full max-w-6xl flex-col items-center px-5 pb-0 pt-10 text-center sm:px-8 sm:pb-0 sm:pt-14">
           <h1 className="fade-up delay-2 mt-7 max-w-5xl bg-gradient-to-b from-white via-white/95 to-white/60 bg-clip-text text-[48px] font-semibold leading-[0.9] tracking-[-0.075em] text-transparent sm:text-[72px] lg:text-[96px]">
             La próxima forma de vivir eventos.
           </h1>
@@ -70,34 +71,36 @@ export default function HomePage() {
           <div id="lanzamiento">
             <Countdown />
           </div>
+          <section id="footer-section" className="w-full mt-12 mb-1 px-6">
+            <div className="mx-auto flex max-w-6xl flex-col items-center gap-3">
+              <div className="flex items-center gap-2">
+                <SocialLink
+                  href="https://www.instagram.com/allons.hn/"
+                  label="Instagram"
+                >
+                  <InstagramIcon />
+                </SocialLink>
+                <SocialLink
+                  href="https://tiktok.com/@allons.app"
+                  label="TikTok"
+                >
+                  <TikTokIcon />
+                </SocialLink>
+              </div>
+              <div className="text-[13px] tracking-tight text-white/56">
+                © Allons 2026 · Desarrollado por{" "}
+                <a
+                  href="https://thefndrs.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-white/90 underline decoration-white/45 underline-offset-2 transition-all duration-300 ease-out hover:text-white hover:decoration-white/80 hover:[text-shadow:0_0_14px_rgba(255,255,255,0.9),0_0_30px_rgba(255,255,255,0.55)]"
+                >
+                  FNDRS
+                </a>
+              </div>
+            </div>
+          </section>
         </main>
-
-        <footer className="relative z-10 mt-6 border-t border-white/10 bg-gradient-to-b from-transparent via-[#120c08]/55 to-[#1a120b]/70 px-6 pb-8 pt-6 backdrop-blur-[2px] sm:pb-10 sm:pt-7">
-          <div className="mx-auto flex max-w-6xl flex-col items-center gap-4">
-            <div className="flex items-center gap-2">
-              <SocialLink
-                href="https://www.instagram.com/allons.hn/"
-                label="Instagram"
-              >
-                <InstagramIcon />
-              </SocialLink>
-              <SocialLink href="https://tiktok.com/@allons.app" label="TikTok">
-                <TikTokIcon />
-              </SocialLink>
-            </div>
-            <div className="text-[13px] tracking-tight text-white/65">
-              © Allons 2026 · Desarrollado por{" "}
-              <a
-                href="https://thefndrs.com"
-                target="_blank"
-                rel="noreferrer"
-                className="text-[#f7a86d] underline decoration-[#f7a86d]/35 underline-offset-2 transition-all duration-300 ease-out hover:text-[#ffd0a8] hover:decoration-[#ffd0a8]/60 hover:[text-shadow:0_0_14px_rgba(246,112,16,0.45)]"
-              >
-                FNDRS
-              </a>
-            </div>
-          </div>
-        </footer>
       </div>
     </>
   );
@@ -118,7 +121,7 @@ function SocialLink({
       target="_blank"
       rel="noreferrer"
       aria-label={label}
-      className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-[#f5b78a] transition-colors hover:border-[#f67010]/35 hover:bg-[#f67010]/10 hover:text-[#ffd5b6]"
+      className="flex size-9 items-center justify-center rounded-full text-white/70 transition-colors hover:text-white"
     >
       {children}
     </a>
