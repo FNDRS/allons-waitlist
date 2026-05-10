@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const FALLBACK_COUNT = 320;
 const COUNT_OFFSET = 247;
@@ -15,23 +15,67 @@ const avatars = [
 
 export function SocialProof() {
   const [count, setCount] = useState<number>(FALLBACK_COUNT);
+  const [displayCount, setDisplayCount] = useState<number>(0);
+  const animRef = useRef<number | null>(null);
+  const displayRef = useRef<number>(0);
+  const hasAnimatedOnceRef = useRef(false);
+
+  const animateTo = (next: number) => {
+    if (animRef.current) window.cancelAnimationFrame(animRef.current);
+    const from = displayRef.current;
+    const to = Math.max(FALLBACK_COUNT, next);
+    const durationMs = 1400;
+    const start = performance.now();
+
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / durationMs);
+      // Ease-out cubic.
+      const eased = 1 - Math.pow(1 - t, 3);
+      const value = Math.round(from + (to - from) * eased);
+      displayRef.current = value;
+      setDisplayCount(value);
+      if (t < 1) animRef.current = window.requestAnimationFrame(tick);
+    };
+
+    animRef.current = window.requestAnimationFrame(tick);
+  };
 
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/waitlist", { method: "GET" })
-      .then((response) => response.json())
-      .then((data) => {
-        if (!cancelled && typeof data?.count === "number") {
-          setCount(Math.max(FALLBACK_COUNT, data.count + COUNT_OFFSET));
-        }
-      })
-      .catch(() => {});
+    const refresh = () => {
+      fetch("/api/waitlist", { method: "GET" })
+        .then((response) => response.json())
+        .then((data) => {
+          if (!cancelled && typeof data?.count === "number") {
+            setCount(Math.max(FALLBACK_COUNT, data.count + COUNT_OFFSET));
+          }
+        })
+        .catch(() => {});
+    };
+
+    refresh();
+
+    const onSignup = () => refresh();
+    window.addEventListener("waitlist:signup", onSignup);
 
     return () => {
       cancelled = true;
+      window.removeEventListener("waitlist:signup", onSignup);
+      if (animRef.current) window.cancelAnimationFrame(animRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    // Animate on first load and whenever count updates.
+    if (!hasAnimatedOnceRef.current) {
+      hasAnimatedOnceRef.current = true;
+      displayRef.current = 0;
+      setDisplayCount(0);
+    }
+    animateTo(count);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count]);
 
   return (
     <div className="fade-up delay-5 mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -49,7 +93,7 @@ export function SocialProof() {
       <p className="text-sm text-white/58">
         Únete a más de{" "}
         <span className="font-semibold text-white tabular-nums">
-          {count.toLocaleString("es-HN")}
+          {displayCount.toLocaleString("es-HN")}
         </span>{" "}
         personas en la lista.
       </p>

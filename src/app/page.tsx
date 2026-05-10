@@ -1,9 +1,38 @@
+import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Countdown } from "@/components/Countdown";
 import { HeroStickyLayer } from "@/components/HeroStickyLayer";
 import { Motes } from "@/components/Motes";
 import { SocialProof } from "@/components/SocialProof";
 import { WaitlistForm } from "@/components/WaitlistForm";
+
+export const metadata: Metadata = {
+  title: "Lista de espera — Allons Honduras",
+  description:
+    "Únete a la lista de espera de Allons. Descubre, gestiona y entra a eventos en Honduras con una experiencia simple y elegante.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Allons — La próxima forma de vivir eventos",
+    description:
+      "Regístrate en la lista de espera de Allons para acceder antes al lanzamiento en Honduras.",
+    url: "https://allonsapp.com",
+    images: [
+      {
+        url: "https://allonsapp.com/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Allons — Lista de espera",
+      },
+    ],
+  },
+  twitter: {
+    title: "Allons — Lista de espera",
+    description: "Acceso anticipado a la nueva experiencia de eventos en Honduras.",
+    images: ["https://allonsapp.com/opengraph-image"],
+  },
+};
 
 export default function HomePage() {
   return (
@@ -24,7 +53,7 @@ export default function HomePage() {
             Allons está preparando una experiencia más simple, elegante y
             exclusiva para descubrir, gestionar y entrar a eventos en Honduras.
           </p>
-          <section id="lista" className="fade-up delay-5 mt-9 w-full max-w-2xl">
+          <section id="lista" className="fade-up delay-5 mt-9 w-full max-w-sm">
             <div className="rounded-[28px] bg-transparent p-3 shadow-[inset_0_0_1px_rgba(255,255,255,0.06)]">
               <Suspense
                 fallback={
@@ -43,7 +72,7 @@ export default function HomePage() {
           </div>
         </main>
 
-        <footer className="relative z-10 px-6 pb-8 sm:pb-10">
+        <footer className="relative z-10 mt-6 border-t border-white/10 bg-gradient-to-b from-transparent via-[#120c08]/55 to-[#1a120b]/70 px-6 pb-8 pt-6 backdrop-blur-[2px] sm:pb-10 sm:pt-7">
           <div className="mx-auto flex max-w-6xl flex-col items-center gap-4">
             <div className="flex items-center gap-2">
               <SocialLink
@@ -56,13 +85,13 @@ export default function HomePage() {
                 <TikTokIcon />
               </SocialLink>
             </div>
-            <div className="text-[13px] tracking-tight text-white/44">
+            <div className="text-[13px] tracking-tight text-white/65">
               © Allons 2026 · Desarrollado por{" "}
               <a
                 href="https://thefndrs.com"
                 target="_blank"
                 rel="noreferrer"
-                className="text-white/55 underline decoration-white/15 underline-offset-2 transition-all duration-300 ease-out hover:text-white/85 hover:decoration-white/40"
+                className="text-[#f7a86d] underline decoration-[#f7a86d]/35 underline-offset-2 transition-all duration-300 ease-out hover:text-[#ffd0a8] hover:decoration-[#ffd0a8]/60 hover:[text-shadow:0_0_14px_rgba(246,112,16,0.45)]"
               >
                 FNDRS
               </a>
@@ -89,7 +118,7 @@ function SocialLink({
       target="_blank"
       rel="noreferrer"
       aria-label={label}
-      className="flex size-9 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/5 hover:text-white"
+      className="flex size-9 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-[#f5b78a] transition-colors hover:border-[#f67010]/35 hover:bg-[#f67010]/10 hover:text-[#ffd5b6]"
     >
       {children}
     </a>

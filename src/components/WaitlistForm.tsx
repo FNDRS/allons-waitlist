@@ -59,6 +59,8 @@ export function WaitlistForm({
         throw new Error(data?.error || "Algo salió mal. Inténtalo de nuevo.");
       }
       setStatus("success");
+      // Let other components (e.g. SocialProof) react/refresh.
+      window.dispatchEvent(new CustomEvent("waitlist:signup"));
     } catch (err) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Error inesperado");

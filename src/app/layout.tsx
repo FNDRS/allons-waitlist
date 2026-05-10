@@ -1,9 +1,22 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+const SITE_URL = "https://allonsapp.com";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://allons.app"),
+  metadataBase: new URL(SITE_URL),
+  // Next uses this to resolve social image routes to absolute URLs.
+  // (Avoids build-time warning when images are relative.)
   applicationName: "Allons",
+  referrer: "origin-when-cross-origin",
+  creator: "Allons",
+  publisher: "Allons",
+  category: "technology",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   title: {
     default: "Allons — Eventos sin fricción",
     template: "%s — Allons",
@@ -41,14 +54,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_HN",
-    url: "https://allons.app",
+    url: SITE_URL,
     siteName: "Allons",
     title: "Allons — Eventos sin fricción",
     description:
       "Únete a la lista de espera. Próximamente en Honduras y Latinoamérica.",
     images: [
       {
-        url: "/opengraph-image",
+        url: `${SITE_URL}/opengraph-image`,
         width: 1200,
         height: 630,
         alt: "Allons — Eventos sin fricción",
@@ -59,7 +72,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Allons — Eventos sin fricción",
     description: "Únete a la lista de espera.",
-    images: ["/opengraph-image"],
+    images: [`${SITE_URL}/opengraph-image`],
   },
   robots: {
     index: true,
@@ -81,12 +94,35 @@ export default function RootLayout({
 }) {
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Allons",
-    url: "https://allons.app",
-    sameAs: [
-      "https://www.instagram.com/allons.hn/",
-      "https://www.tiktok.com/@allons.app",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: "Allons",
+        url: SITE_URL,
+        sameAs: [
+          "https://www.instagram.com/allons.hn/",
+          "https://www.tiktok.com/@allons.app",
+        ],
+      },
+      {
+        "@type": "WebSite",
+        name: "Allons",
+        url: SITE_URL,
+        inLanguage: "es-HN",
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "Allons",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "iOS, Android, Web",
+        url: SITE_URL,
+        inLanguage: "es-HN",
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+        },
+      },
     ],
   };
 
