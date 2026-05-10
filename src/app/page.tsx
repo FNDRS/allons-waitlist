@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { Countdown } from "@/components/Countdown";
-import { HeroNav } from "@/components/HeroNav";
+import { HeroStickyLayer } from "@/components/HeroStickyLayer";
 import { Motes } from "@/components/Motes";
 import { SocialProof } from "@/components/SocialProof";
 import { WaitlistForm } from "@/components/WaitlistForm";
@@ -8,15 +8,13 @@ import { WaitlistForm } from "@/components/WaitlistForm";
 export default function HomePage() {
   return (
     <>
-      <div className="hero-spotlight" aria-hidden />
+      <HeroStickyLayer />
       <div className="ambient" aria-hidden />
       <Motes />
       <div className="vignette" aria-hidden />
       <div className="grain" aria-hidden />
 
-      <div className="relative z-10 flex min-h-screen flex-col">
-        <HeroNav />
-
+      <div className="relative z-10 flex min-h-screen flex-col pt-16 sm:pt-20">
         <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-5 pb-12 pt-10 text-center sm:px-8 sm:pb-16 sm:pt-14">
           <h1 className="fade-up delay-2 mt-7 max-w-5xl bg-gradient-to-b from-white via-white/95 to-white/60 bg-clip-text text-[48px] font-semibold leading-[0.9] tracking-[-0.075em] text-transparent sm:text-[72px] lg:text-[96px]">
             La próxima forma de vivir eventos.
@@ -49,7 +47,7 @@ export default function HomePage() {
           <div className="mx-auto flex max-w-6xl flex-col items-center gap-4">
             <div className="flex items-center gap-2">
               <SocialLink
-                href="https://instagram.com/allons.app"
+                href="https://www.instagram.com/allons.hn/"
                 label="Instagram"
               >
                 <InstagramIcon />

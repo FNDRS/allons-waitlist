@@ -55,17 +55,30 @@
    ───────────────────────────────────────────── */
 .hero-spotlight {
   --hero-spot-mul: 1;
-  --hero-spot-top: clamp(60px, 8.5vh, 100px);
+  /* Keep the lamp position stable across web/tablet/mobile (no viewport-unit drift). */
+  --hero-spot-top: 84px;
   --hero-spot-bar-w: clamp(220px, 30vw, 380px);
   --hero-spot-cone-w: clamp(1000px, 125vw, 1900px);
-  --hero-spot-cone-h: clamp(900px, 120vh, 1400px);
+  --hero-spot-cone-h: 1200px;
   --hero-spot-blur: 38px;
 
-  position: fixed;
-  inset: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100svh;
   pointer-events: none;
   z-index: 4;
   overflow: hidden;
+}
+
+.hero-sticky-layer {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 100svh;
+  z-index: 30;
+  pointer-events: none;
+  will-change: transform, opacity;
 }
 
 /* Soft pool of light under the lamp bar — stacked elliptical halos that
@@ -247,7 +260,7 @@
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: 5;
   mix-blend-mode: screen;
 }
 
@@ -265,6 +278,7 @@
   box-shadow:
     0 0 4px rgba(255, 255, 255, 0.55),
     0 0 10px rgba(255, 255, 255, 0.25);
+  opacity: 0.7;
   will-change: transform, opacity;
 }
 
