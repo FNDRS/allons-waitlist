@@ -96,27 +96,49 @@ export function WaitlistForm({
   useEffect(() => {
     if (status !== "success") return;
 
-    const durationMs = 1400;
+    const durationMs = 2400;
+    const colors = [
+      "#F67010",
+      "#C8420A",
+      "#FF8A3D",
+      "#FFBE0B",
+      "#FFFFFF",
+    ];
+
+    // Kickoff burst.
+    confetti({
+      particleCount: 70,
+      spread: 70,
+      startVelocity: 32,
+      origin: { x: 0.5, y: 0.65 },
+      ticks: 220,
+      colors,
+    });
+
     const interval = window.setInterval(() => {
       const spread = 70;
-      const ticks = 160;
+      const ticks = 200;
       confetti({
-        particleCount: 3,
+        particleCount: 7,
         angle: 60,
         spread,
         origin: { x: 0, y: 0.6 },
         ticks,
-        colors: ["#10B981", "#34D399", "#6EE7B7", "#FFFFFF"],
+        startVelocity: 26,
+        scalar: 1,
+        colors,
       });
       confetti({
-        particleCount: 3,
+        particleCount: 7,
         angle: 120,
         spread,
         origin: { x: 1, y: 0.6 },
         ticks,
-        colors: ["#10B981", "#34D399", "#6EE7B7", "#FFFFFF"],
+        startVelocity: 26,
+        scalar: 1,
+        colors,
       });
-    }, 180);
+    }, 140);
 
     window.setTimeout(() => window.clearInterval(interval), durationMs);
     return () => window.clearInterval(interval);
