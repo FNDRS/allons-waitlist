@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { Countdown } from "@/components/Countdown";
 import { HeroNav } from "@/components/HeroNav";
+import { Motes } from "@/components/Motes";
 import { SocialProof } from "@/components/SocialProof";
 import { WaitlistForm } from "@/components/WaitlistForm";
 
@@ -9,7 +10,7 @@ export default function HomePage() {
     <>
       <div className="hero-spotlight" aria-hidden />
       <div className="ambient" aria-hidden />
-      <div className="streaks" aria-hidden />
+      <Motes />
       <div className="vignette" aria-hidden />
       <div className="grain" aria-hidden />
 
