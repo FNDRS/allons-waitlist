@@ -56,7 +56,7 @@ vercel --prod
 
 La landing lee el query param `?src=`. El valor se guarda en la columna `source`.
 
-URL → `https://allons.app/?src=la20`
+URL → `https://allonsapp.com/?src=la20`
 Insert → `{ email: "...", source: "la20" }`
 
 ### Generar los QRs
