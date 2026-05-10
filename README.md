@@ -8,7 +8,6 @@ Negro, logo + un solo CTA → captura email → guarda en Supabase con atribuci�
 - React 19
 - Tailwind 4
 - Supabase (tabla `waitlist`)
-- `qrcode` (script de generación)
 
 ## Setup rápido
 
@@ -62,24 +61,9 @@ Insert → `{ email: "...", source: "la20" }`
 
 ### Generar los QRs
 
-1. Edita `scripts/generate-qr.ts` y agrega tus ubicaciones a `SOURCES`:
-   ```ts
-   const SOURCES = [
-     { slug: "la20", label: "La 20 Cervecería" },
-     { slug: "diunsa", label: "Diunsa" },
-     { slug: "multiplaza", label: "Mall Multiplaza" },
-   ];
-   ```
-
-2. Corre el script:
-   ```bash
-   BASE_URL=https://allons.app pnpm run qr
-   ```
-
-3. Encuentra los archivos en `./qrs/`:
-   - `la20.png` (1024×1024, listo para imprimir)
-   - `la20.svg` (vectorial)
-   - `index.json` (resumen de URLs)
+La generación de QRs se gestiona desde `allons-admin`, no desde este repo.
+Usa la vista `/waitlist-qr` del panel admin o el script `pnpm run qr` en
+`allons-admin`.
 
 ### Reglas para los slugs
 
@@ -121,7 +105,6 @@ order by 1 desc, 3 desc;
 .
 ├── db/schema.sql                  # corre esto en Supabase
 ├── public/                        # logo Allons
-├── scripts/generate-qr.ts         # genera QRs con ?src=
 └── src/
     ├── app/
     │   ├── api/waitlist/route.ts  # POST endpoint (server-side, service_role)
