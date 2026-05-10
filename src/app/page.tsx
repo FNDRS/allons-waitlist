@@ -57,7 +57,15 @@ export default function HomePage() {
               </SocialLink>
             </div>
             <div className="text-[13px] tracking-tight text-white/44">
-              © Allons 2026 · Desarrollado por FNDRS
+              © Allons 2026 · Desarrollado por{" "}
+              <a
+                href="https://thefndrs.com"
+                target="_blank"
+                rel="noreferrer"
+                className="text-white/55 underline decoration-white/15 underline-offset-2 transition-all duration-300 ease-out hover:text-white/85 hover:decoration-white/40"
+              >
+                FNDRS
+              </a>
             </div>
           </div>
         </footer>
