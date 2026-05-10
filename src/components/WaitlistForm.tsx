@@ -140,8 +140,14 @@ export function WaitlistForm({
       });
     }, 140);
 
-    window.setTimeout(() => window.clearInterval(interval), durationMs);
-    return () => window.clearInterval(interval);
+    const timeout = window.setTimeout(
+      () => window.clearInterval(interval),
+      durationMs,
+    );
+    return () => {
+      window.clearInterval(interval);
+      window.clearTimeout(timeout);
+    };
   }, [status]);
 
   useEffect(() => {
