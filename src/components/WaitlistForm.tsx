@@ -6,6 +6,7 @@ import confetti from "canvas-confetti";
 import { WAITLIST_BASE_SUBSCRIBERS } from "@/lib/waitlist-count";
 
 type Status = "idle" | "loading" | "success" | "error";
+type InputStep = "email" | "phone";
 
 interface WaitlistSubmitResponse {
   ok?: boolean;
@@ -35,22 +36,25 @@ export function WaitlistForm({
   const source = params.get("src");
 
   const [step, setStep] = useState<"cta" | "email">(expanded ? "email" : "cta");
+  const [inputStep, setInputStep] = useState<InputStep>("email");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successTotal, setSuccessTotal] = useState<number>(WAITLIST_BASE_SUBSCRIBERS);
   const [animatedSuccessTotal, setAnimatedSuccessTotal] = useState<number>(WAITLIST_BASE_SUBSCRIBERS);
   const inputRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
   const successAnimRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (step === "email" && (autoFocus || !expanded)) {
+    if (step === "email" && inputStep === "email" && (autoFocus || !expanded)) {
       const t = setTimeout(() => inputRef.current?.focus(), 80);
       return () => clearTimeout(t);
     }
-  }, [step, autoFocus, expanded]);
+  }, [step, autoFocus, expanded, inputStep]);
 
-  const submit = async () => {
+  const advanceToPhone = () => {
     setErrorMsg(null);
     const trimmed = email.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
@@ -58,13 +62,22 @@ export function WaitlistForm({
       setErrorMsg("Correo inválido");
       return;
     }
+    setStatus("idle");
+    setInputStep("phone");
+    setTimeout(() => phoneRef.current?.focus(), 50);
+  };
+
+  const submit = async () => {
+    setErrorMsg(null);
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPhone = phone.trim() || null;
 
     setStatus("loading");
     try {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: trimmed, source }),
+        body: JSON.stringify({ email: trimmedEmail, phone: trimmedPhone, source }),
       });
       const data: WaitlistSubmitResponse = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -74,11 +87,10 @@ export function WaitlistForm({
         setSuccessTotal(Math.max(WAITLIST_BASE_SUBSCRIBERS, data.totalSubscribers));
       }
       setStatus("success");
-      // Let other components (e.g. SocialProof) react/refresh.
       window.dispatchEvent(
         new CustomEvent("waitlist:signup", {
           detail: {
-            email: trimmed,
+            email: trimmedEmail,
             duplicate: Boolean(data.duplicate),
             totalSubscribers:
               typeof data.totalSubscribers === "number"
@@ -98,28 +110,32 @@ export function WaitlistForm({
 
     const durationMs = 2400;
     const colors = [
-      "#F67010",
-      "#C8420A",
-      "#FF8A3D",
-      "#FFBE0B",
+      "#6366F1",
+      "#EC4899",
+      "#14B8A6",
+      "#F59E0B",
+      "#10B981",
+      "#3B82F6",
+      "#A855F7",
+      "#EF4444",
+      "#FBBF24",
       "#FFFFFF",
     ];
 
-    // Kickoff burst.
     confetti({
-      particleCount: 70,
-      spread: 70,
-      startVelocity: 32,
+      particleCount: 80,
+      spread: 80,
+      startVelocity: 34,
       origin: { x: 0.5, y: 0.65 },
       ticks: 220,
       colors,
     });
 
     const interval = window.setInterval(() => {
-      const spread = 70;
+      const spread = 75;
       const ticks = 200;
       confetti({
-        particleCount: 7,
+        particleCount: 8,
         angle: 60,
         spread,
         origin: { x: 0, y: 0.6 },
@@ -129,7 +145,7 @@ export function WaitlistForm({
         colors,
       });
       confetti({
-        particleCount: 7,
+        particleCount: 8,
         angle: 120,
         spread,
         origin: { x: 1, y: 0.6 },
@@ -140,10 +156,7 @@ export function WaitlistForm({
       });
     }, 140);
 
-    const timeout = window.setTimeout(
-      () => window.clearInterval(interval),
-      durationMs,
-    );
+    const timeout = window.setTimeout(() => window.clearInterval(interval), durationMs);
     return () => {
       window.clearInterval(interval);
       window.clearTimeout(timeout);
@@ -188,11 +201,7 @@ export function WaitlistForm({
           }
         >
           <CheckIcon />
-          <span
-            className={
-              "text-sm font-semibold " + (isDark ? "text-white" : "text-black")
-            }
-          >
+          <span className={"text-sm font-semibold " + (isDark ? "text-white" : "text-black")}>
             Estás dentro
           </span>
         </div>
@@ -214,27 +223,15 @@ export function WaitlistForm({
             {animatedSuccessTotal.toLocaleString("es-HN")}
           </p>
         </div>
-        <p
-          className={
-            "text-[12px] text-center tracking-wide " +
-            (isDark ? "text-white/60" : "text-black/55")
-          }
-        >
+        <p className={"text-[12px] text-center tracking-wide " + (isDark ? "text-white/60" : "text-black/55")}>
           Te confirmaremos por correo en{" "}
-          <span
-            className={
-              "font-medium " + (isDark ? "text-white" : "text-black")
-            }
-          >
-            {email}
-          </span>{" "}
+          <span className={"font-medium " + (isDark ? "text-white" : "text-black")}>{email}</span>{" "}
           cuando lancemos.
         </p>
       </div>
     );
   }
 
-  // Closed CTA-first variant (used as a primary button)
   if (step === "cta") {
     return (
       <button
@@ -247,9 +244,7 @@ export function WaitlistForm({
             : "bg-black text-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.35)]")
         }
       >
-        <span className="relative flex-1 text-center -ml-12 tracking-tight">
-          {ctaLabel}
-        </span>
+        <span className="relative flex-1 text-center -ml-12 tracking-tight">{ctaLabel}</span>
         <span
           className={
             "relative flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 group-hover:translate-x-0.5 " +
@@ -264,14 +259,18 @@ export function WaitlistForm({
     );
   }
 
+  const onFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (status === "loading") return;
+    if (inputStep === "email") {
+      advanceToPhone();
+    } else {
+      submit();
+    }
+  };
+
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        if (status !== "loading") submit();
-      }}
-      className="w-full flex flex-col items-stretch gap-3"
-    >
+    <form onSubmit={onFormSubmit} className="w-full flex flex-col items-stretch gap-3">
       <div
         className={
           "relative w-full h-14 rounded-full flex items-center pr-2 pl-6 " +
@@ -280,67 +279,122 @@ export function WaitlistForm({
             : "bg-white border border-black/8 shadow-[0_10px_40px_-12px_rgba(0,0,0,0.25)]")
         }
       >
-        <input
-          ref={inputRef}
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          enterKeyHint="send"
-          placeholder="tu@email.com"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            if (status === "error") {
-              setStatus("idle");
-              setErrorMsg(null);
-            }
-          }}
-          className={
-            "flex-1 h-full bg-transparent text-base font-medium outline-none tracking-tight " +
-            (isDark
-              ? "text-white placeholder:text-white/35"
-              : "text-black placeholder:text-black/35")
-          }
-        />
+        {/* Sliding input area */}
+        <div className="relative flex-1 h-full overflow-hidden">
+          {/* Email input — slides up when advancing to phone */}
+          <div
+            className="absolute inset-0 flex items-center transition-all duration-300 ease-in-out"
+            style={{
+              transform: inputStep === "email" ? "translateY(0)" : "translateY(-120%)",
+              opacity: inputStep === "email" ? 1 : 0,
+              pointerEvents: inputStep === "email" ? "auto" : "none",
+            }}
+          >
+            <input
+              ref={inputRef}
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              enterKeyHint="next"
+              placeholder="tu@email.com"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (status === "error") {
+                  setStatus("idle");
+                  setErrorMsg(null);
+                }
+              }}
+              className={
+                "w-full h-full bg-transparent text-base font-medium outline-none tracking-tight " +
+                (isDark
+                  ? "text-white placeholder:text-white/35"
+                  : "text-black placeholder:text-black/35")
+              }
+            />
+          </div>
+
+          {/* Phone input — slides in from below */}
+          <div
+            className="absolute inset-0 flex items-center transition-all duration-300 ease-in-out"
+            style={{
+              transform: inputStep === "phone" ? "translateY(0)" : "translateY(120%)",
+              opacity: inputStep === "phone" ? 1 : 0,
+              pointerEvents: inputStep === "phone" ? "auto" : "none",
+            }}
+          >
+            <input
+              ref={phoneRef}
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              enterKeyHint="send"
+              placeholder="+504 9999-9999"
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                if (status === "error") {
+                  setStatus("idle");
+                  setErrorMsg(null);
+                }
+              }}
+              className={
+                "w-full h-full bg-transparent text-base font-medium outline-none tracking-tight " +
+                (isDark
+                  ? "text-white placeholder:text-white/35"
+                  : "text-black placeholder:text-black/35")
+              }
+            />
+          </div>
+        </div>
+
         <button
           type="submit"
           disabled={status === "loading"}
           className="h-12 px-6 rounded-full bg-[var(--color-accent)] text-white font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-60 transition-all duration-200 active:scale-[0.97] hover:bg-[var(--color-accent-deep)]"
         >
-          {status === "loading" ? <Spinner /> : "Unirme"}
+          {status === "loading" ? (
+            <Spinner />
+          ) : inputStep === "email" ? (
+            <ArrowIcon />
+          ) : (
+            "Unirme"
+          )}
         </button>
       </div>
 
       <div className="flex items-center justify-center min-h-[18px]">
         {errorMsg ? (
-          <p
-            className={
-              "text-[11px] tracking-wide " +
-              (isDark ? "text-red-300" : "text-red-500")
-            }
-          >
+          <p className={"text-[11px] tracking-wide " + (isDark ? "text-red-300" : "text-red-500")}>
             {errorMsg}
           </p>
+        ) : inputStep === "phone" ? (
+          <button
+            type="button"
+            onClick={() => {
+              setInputStep("email");
+              setTimeout(() => inputRef.current?.focus(), 50);
+            }}
+            className={
+              "text-[11px] tracking-[0.15em] uppercase transition-colors " +
+              (isDark ? "text-white/40 hover:text-white" : "text-black/40 hover:text-black")
+            }
+          >
+            ← regresar
+          </button>
         ) : !expanded ? (
           <button
             type="button"
             onClick={() => setStep("cta")}
             className={
               "text-[11px] tracking-[0.15em] uppercase transition-colors " +
-              (isDark
-                ? "text-white/40 hover:text-white"
-                : "text-black/40 hover:text-black")
+              (isDark ? "text-white/40 hover:text-white" : "text-black/40 hover:text-black")
             }
           >
             ← regresar
           </button>
         ) : (
-          <p
-            className={
-              "text-[11px] tracking-wide " +
-              (isDark ? "text-white/45" : "text-black/45")
-            }
-          >
+          <p className={"text-[11px] tracking-wide " + (isDark ? "text-white/45" : "text-black/45")}>
             Sin spam. Solo novedades relevantes de lanzamiento.
           </p>
         )}

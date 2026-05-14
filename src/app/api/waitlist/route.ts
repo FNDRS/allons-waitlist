@@ -26,7 +26,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  let body: { email?: unknown; source?: unknown };
+  let body: { email?: unknown; phone?: unknown; source?: unknown };
   try {
     body = await req.json();
   } catch {
@@ -41,6 +41,11 @@ export async function POST(req: NextRequest) {
   const rawSource = typeof body.source === "string" ? body.source.trim() : "";
   const source = rawSource && SOURCE_RE.test(rawSource) ? rawSource.toLowerCase() : null;
 
+  const phone =
+    typeof body.phone === "string" && body.phone.trim().length > 0
+      ? body.phone.trim().slice(0, 30)
+      : null;
+
   const userAgent = req.headers.get("user-agent")?.slice(0, 500) ?? null;
   const referer = req.headers.get("referer")?.slice(0, 500) ?? null;
   const ip =
@@ -49,7 +54,7 @@ export async function POST(req: NextRequest) {
     null;
 
   const supabase = getSupabaseAdmin();
-  const row = { email, source, user_agent: userAgent, referer, ip };
+  const row = { email, phone, source, user_agent: userAgent, referer, ip };
   const { error } = await supabase.from("waitlist").insert(row as never);
 
   if (error) {
