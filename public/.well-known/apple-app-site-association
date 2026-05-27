@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "F5AC2P3U57.com.fndrs.allons",
+        "paths": ["/verify", "/verify/*", "/tickets", "/tickets/*"]
+      }
+    ]
+  }
+}
