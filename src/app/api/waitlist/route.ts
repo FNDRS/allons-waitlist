@@ -59,6 +59,15 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     if (error.code === "23505") {
+      if (phone) {
+        const { error: updateError } = await supabase
+          .from("waitlist")
+          .update({ phone } as never)
+          .eq("email", email);
+        if (updateError) {
+          console.error("[waitlist] phone update error", updateError);
+        }
+      }
       try {
         const totals = await getWaitlistTotals();
         return NextResponse.json({

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import confetti from "canvas-confetti";
+import { toast } from "sonner";
 import { WAITLIST_BASE_SUBSCRIBERS } from "@/lib/waitlist-count";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -65,6 +66,25 @@ export function WaitlistForm({
     setStatus("idle");
     setInputStep("phone");
     setTimeout(() => phoneRef.current?.focus(), 50);
+    saveEmail(trimmed);
+  };
+
+  const saveEmail = async (trimmed: string) => {
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed, source }),
+      });
+      const data: WaitlistSubmitResponse = await res.json().catch(() => ({}));
+      if (res.ok || data?.duplicate) {
+        toast.success("Ahora ingresa tu número de teléfono");
+      } else {
+        toast.error(data?.error || "Error al guardar el correo");
+      }
+    } catch {
+      toast.error("Error al guardar el correo");
+    }
   };
 
   const submit = async () => {
