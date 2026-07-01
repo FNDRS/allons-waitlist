@@ -6,6 +6,7 @@ create extension if not exists "pgcrypto";
 create table if not exists public.waitlist (
   id uuid primary key default gen_random_uuid(),
   email text not null,
+  phone text,
   source text,
   referer text,
   user_agent text,
