@@ -54,7 +54,8 @@ export async function POST(req: NextRequest) {
     null;
 
   const supabase = getSupabaseAdmin();
-  const row = { email, phone, source, user_agent: userAgent, referer, ip };
+  const row: Record<string, unknown> = { email, source, user_agent: userAgent, referer, ip };
+  if (phone) row.phone = phone;
   const { error } = await supabase.from("waitlist").insert(row as never);
 
   if (error) {

@@ -149,7 +149,19 @@ export default function RootLayout({
       </head>
       <body>
         {children}
-        <Toaster position="top-center" richColors closeButton />
+        <Toaster
+          position="top-center"
+          richColors
+          closeButton
+          expand
+          visibleToasts={3}
+          gap={12}
+          offset="80px"
+          toastOptions={{
+            className: "font-sans text-sm tracking-tight",
+            duration: 4000,
+          }}
+        />
       </body>
     </html>
   );
