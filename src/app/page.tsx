@@ -81,10 +81,16 @@ export default function HomePage() {
                   <InstagramIcon />
                 </SocialLink>
                 <SocialLink
-                  href="https://tiktok.com/@allons.app"
+                  href="https://www.tiktok.com/@allons.hn?_r=1&_t=ZS-97bZpRR00Up"
                   label="TikTok"
                 >
                   <TikTokIcon />
+                </SocialLink>
+                <SocialLink
+                  href="https://www.linkedin.com/company/allons-app"
+                  label="LinkedIn"
+                >
+                  <LinkedInIcon />
                 </SocialLink>
               </div>
               <div className="text-[13px] tracking-tight text-white/56">
@@ -158,6 +164,20 @@ function TikTokIcon() {
       />
       <path
         d="M14 3c.7 2.6 2.5 4.3 5 4.6"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function LinkedInIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M7.2 9.5V20M12 20v-5.6c0-3.1 5-3.4 5 0V20M7.2 5.2v.1M4 20h16"
         stroke="currentColor"
         strokeWidth="1.6"
         strokeLinecap="round"

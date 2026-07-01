@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 // Launch in Honduras time (UTC-06:00).
-const LAUNCH_DATE = new Date("2026-07-20T19:00:00-06:00").getTime();
+const LAUNCH_DATE = new Date("2026-10-09T19:00:00-06:00").getTime();
 
 type TimeLeft = {
   days: number;

@@ -101,7 +101,8 @@ export default function RootLayout({
         url: SITE_URL,
         sameAs: [
           "https://www.instagram.com/allons.hn/",
-          "https://www.tiktok.com/@allons.app",
+          "https://www.tiktok.com/@allons.hn?_r=1&_t=ZS-97bZpRR00Up",
+          "https://www.linkedin.com/company/allons-app",
         ],
       },
       {
