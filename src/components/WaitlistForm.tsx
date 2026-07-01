@@ -40,6 +40,7 @@ export function WaitlistForm({
   const [inputStep, setInputStep] = useState<InputStep>("email");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneRaw, setPhoneRaw] = useState("");
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successTotal, setSuccessTotal] = useState<number>(WAITLIST_BASE_SUBSCRIBERS);
@@ -90,7 +91,7 @@ export function WaitlistForm({
   const submit = async () => {
     setErrorMsg(null);
     const trimmedEmail = email.trim().toLowerCase();
-    const trimmedPhone = phone.trim() || null;
+    const trimmedPhone = phoneRaw || null;
 
     setStatus("loading");
     try {
@@ -352,7 +353,9 @@ export function WaitlistForm({
               placeholder="+504 9999-9999"
               value={phone}
               onChange={(e) => {
-                setPhone(e.target.value);
+                const digits = e.target.value.replace(/\D/g, "").slice(0, 8);
+                setPhoneRaw(digits);
+                setPhone(digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits);
                 if (status === "error") {
                   setStatus("idle");
                   setErrorMsg(null);

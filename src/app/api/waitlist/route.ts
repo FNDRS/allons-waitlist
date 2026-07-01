@@ -26,99 +26,105 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  let body: { email?: unknown; phone?: unknown; source?: unknown };
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-  }
+    let body: { email?: unknown; phone?: unknown; source?: unknown };
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    }
 
-  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-  if (!EMAIL_RE.test(email)) {
-    return NextResponse.json({ error: "Correo inválido" }, { status: 400 });
-  }
+    const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    if (!EMAIL_RE.test(email)) {
+      return NextResponse.json({ error: "Correo inválido" }, { status: 400 });
+    }
 
-  const rawSource = typeof body.source === "string" ? body.source.trim() : "";
-  const source = rawSource && SOURCE_RE.test(rawSource) ? rawSource.toLowerCase() : null;
+    const rawSource = typeof body.source === "string" ? body.source.trim() : "";
+    const source = rawSource && SOURCE_RE.test(rawSource) ? rawSource.toLowerCase() : null;
 
-  const phone =
-    typeof body.phone === "string" && body.phone.trim().length > 0
-      ? body.phone.trim().slice(0, 30)
-      : null;
+    const phone =
+      typeof body.phone === "string" && body.phone.trim().length > 0
+        ? body.phone.trim().slice(0, 30)
+        : null;
 
-  const userAgent = req.headers.get("user-agent")?.slice(0, 500) ?? null;
-  const referer = req.headers.get("referer")?.slice(0, 500) ?? null;
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    null;
+    const userAgent = req.headers.get("user-agent")?.slice(0, 500) ?? null;
+    const referer = req.headers.get("referer")?.slice(0, 500) ?? null;
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      req.headers.get("x-real-ip") ||
+      null;
 
-  const supabase = getSupabaseAdmin();
-  const row: Record<string, unknown> = { email, source, user_agent: userAgent, referer, ip };
-  if (phone) row.phone = phone;
-  const { error } = await supabase.from("waitlist").insert(row as never);
+    const supabase = getSupabaseAdmin();
+    const row: Record<string, unknown> = { email, source, user_agent: userAgent, referer, ip };
+    if (phone) row.phone = phone;
+    const { error } = await supabase.from("waitlist").insert(row as never);
 
-  if (error) {
-    if (error.code === "23505") {
-      if (phone) {
-        const { error: updateError } = await supabase
-          .from("waitlist")
-          .update({ phone } as never)
-          .eq("email", email);
-        if (updateError) {
-          console.error("[waitlist] phone update error", updateError);
+    if (error) {
+      if (error.code === "23505") {
+        if (phone) {
+          const { error: updateError } = await supabase
+            .from("waitlist")
+            .update({ phone } as never)
+            .eq("email", email);
+          if (updateError) {
+            console.error("[waitlist] phone update error", updateError);
+          }
+        }
+        try {
+          const totals = await getWaitlistTotals();
+          return NextResponse.json({
+            ok: true,
+            duplicate: true,
+            count: totals.dbCount,
+            totalSubscribers: totals.totalSubscribers,
+          });
+        } catch (countErr) {
+          console.error("[waitlist] duplicate count error", countErr);
+          return NextResponse.json({
+            ok: true,
+            duplicate: true,
+            count: 0,
+            totalSubscribers: WAITLIST_BASE_SUBSCRIBERS,
+          });
         }
       }
-      try {
-        const totals = await getWaitlistTotals();
-        return NextResponse.json({
-          ok: true,
-          duplicate: true,
-          count: totals.dbCount,
-          totalSubscribers: totals.totalSubscribers,
-        });
-      } catch (countErr) {
-        console.error("[waitlist] duplicate count error", countErr);
-        return NextResponse.json({
-          ok: true,
-          duplicate: true,
-          count: 0,
-          totalSubscribers: WAITLIST_BASE_SUBSCRIBERS,
-        });
-      }
-    }
-    console.error("[waitlist] insert error", error);
-    if (process.env.NODE_ENV !== "production") {
+      console.error("[waitlist] insert error", error);
       return NextResponse.json(
         {
-          error: "Insert failed",
-          code: error.code,
-          message: error.message,
-          details: (error as unknown as { details?: string }).details,
-          hint: (error as unknown as { hint?: string }).hint,
+          error: "No se pudo registrar. Inténtalo de nuevo.",
+          ...(process.env.NODE_ENV !== "production"
+            ? {
+                code: error.code,
+                message: error.message,
+                details: (error as unknown as { details?: string }).details,
+                hint: (error as unknown as { hint?: string }).hint,
+              }
+            : {}),
         },
         { status: 500 },
       );
     }
+
+    try {
+      const totals = await getWaitlistTotals();
+      return NextResponse.json({
+        ok: true,
+        count: totals.dbCount,
+        totalSubscribers: totals.totalSubscribers,
+      });
+    } catch (countErr) {
+      console.error("[waitlist] post count error", countErr);
+      return NextResponse.json({
+        ok: true,
+        count: 0,
+        totalSubscribers: WAITLIST_BASE_SUBSCRIBERS,
+      });
+    }
+  } catch (err) {
+    console.error("[waitlist] unexpected error", err);
     return NextResponse.json(
       { error: "No se pudo registrar. Inténtalo de nuevo." },
       { status: 500 },
     );
-  }
-
-  try {
-    const totals = await getWaitlistTotals();
-    return NextResponse.json({
-      ok: true,
-      count: totals.dbCount,
-      totalSubscribers: totals.totalSubscribers,
-    });
-  } catch (countErr) {
-    console.error("[waitlist] post count error", countErr);
-    return NextResponse.json({
-      ok: true,
-      count: 0,
-      totalSubscribers: WAITLIST_BASE_SUBSCRIBERS,
-    });
   }
 }

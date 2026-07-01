@@ -151,15 +151,22 @@ export default function RootLayout({
         {children}
         <Toaster
           position="top-center"
-          richColors
+          theme="dark"
           closeButton
-          expand
           visibleToasts={3}
-          gap={12}
-          offset="80px"
+          gap={10}
+          offset="72px"
           toastOptions={{
             className: "font-sans text-sm tracking-tight",
             duration: 4000,
+            style: {
+              background: "rgba(20,20,22,0.92)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              backdropFilter: "blur(16px)",
+              borderRadius: "14px",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.45)",
+              padding: "14px 16px",
+            },
           }}
         />
       </body>
