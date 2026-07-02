@@ -92,9 +92,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: "No se pudo registrar. Inténtalo de nuevo.",
+          code: error.code,
           ...(process.env.NODE_ENV !== "production"
             ? {
-                code: error.code,
                 message: error.message,
                 details: (error as unknown as { details?: string }).details,
                 hint: (error as unknown as { hint?: string }).hint,
@@ -123,7 +123,10 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("[waitlist] unexpected error", err);
     return NextResponse.json(
-      { error: "No se pudo registrar. Inténtalo de nuevo." },
+      {
+        error: "No se pudo registrar. Inténtalo de nuevo.",
+        code: err instanceof Error ? err.name : "UNKNOWN",
+      },
       { status: 500 },
     );
   }
