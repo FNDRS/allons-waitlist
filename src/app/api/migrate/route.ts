@@ -1,8 +1,72 @@
 import { NextResponse } from "next/server";
-import { getSupabaseAdmin } from "@/lib/supabase-server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const SCHEMA_SQL = `
+create extension if not exists "pgcrypto";
+
+create table if not exists public.waitlist (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  phone text,
+  source text,
+  referer text,
+  user_agent text,
+  ip text,
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists waitlist_email_lower_uniq
+  on public.waitlist (lower(email));
+
+create index if not exists waitlist_source_idx
+  on public.waitlist (source);
+
+alter table public.waitlist enable row level security;
+
+create or replace view public.waitlist_by_source as
+  select
+    coalesce(source, '(direct)') as source,
+    count(*)::int as total,
+    min(created_at) as first_seen_at,
+    max(created_at) as last_seen_at
+  from public.waitlist
+  group by coalesce(source, '(direct)')
+  order by total desc;
+`;
+
+async function tryCreateTable(url: string, key: string): Promise<string | null> {
+  // Try pg-api internal endpoint
+  const endpoints = [
+    { path: "/pg-api/v1/query", body: { query: SCHEMA_SQL } },
+  ];
+
+  for (const ep of endpoints) {
+    try {
+      const res = await fetch(`${url}${ep.path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "X-Connection-Key": key,
+        },
+        body: JSON.stringify(ep.body),
+      });
+      if (res.ok) {
+        const text = await res.text();
+        return `pg-api ok: ${text.slice(0, 200)}`;
+      }
+      const text = await res.text();
+      return `pg-api ${res.status}: ${text.slice(0, 300)}`;
+    } catch {
+      continue;
+    }
+  }
+
+  return null;
+}
 
 export async function GET() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -16,18 +80,11 @@ export async function GET() {
     );
   }
 
-  // Try calling the pg_reload_schema function (if it exists)
-  try {
-    const supabase = getSupabaseAdmin();
-    const { data: reloadData, error: reloadError } = await supabase.rpc(
-      "pg_reload_schema" as never,
-    );
-    results.reloadAttempt = { data: reloadData, error: reloadError };
-  } catch (err) {
-    results.reloadAttempt = { error: String(err) };
-  }
+  // Try to create the table
+  const createResult = await tryCreateTable(url, key);
+  results.createAttempt = createResult;
 
-  // Try to check if table exists via a raw PostgREST request
+  // Re-check if table now exists
   try {
     const pgRes = await fetch(`${url}/rest/v1/waitlist?limit=1`, {
       headers: {
@@ -44,55 +101,16 @@ export async function GET() {
     results.pgError = String(err);
   }
 
-  // If table doesn't exist, try to create it via Supabase Management API
-  if (results.pgStatus !== 200) {
-    // We can't create tables via REST API without a management token.
-    // But we can try to find the project ref from the URL and suggest a fix.
-    const refMatch = url.match(/https:\/\/([^.]+)/);
-    results.projectRef = refMatch ? refMatch[1] : null;
-  }
-
-  // Try to query information_schema via a direct HTTP request
-  try {
-    const infoRes = await fetch(`${url}/rest/v1/rpc/`, {
-      method: "POST",
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    });
-    results.rpcEndpoint = infoRes.status;
-  } catch (err) {
-    results.rpcEndpointError = String(err);
-  }
-
-  // Try to check the GraphQL endpoint
-  try {
-    const gqlRes = await fetch(`${url}/graphql/v1`, {
-      method: "POST",
-      headers: {
-        apikey: key,
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: `{ __schema { types { name } } }`,
-      }),
-    });
-    results.graphqlStatus = gqlRes.status;
-    if (gqlRes.ok) {
-      const gqlData = await gqlRes.json();
-      results.graphqlTypes = gqlData?.data?.__schema?.types
-        ?.filter((t: { name: string }) => t.name.startsWith("waitlist"))
-        ?.map((t: { name: string }) => t.name);
-    }
-  } catch (err) {
-    results.graphqlError = String(err);
-  }
+  const refMatch = url.match(/https:\/\/([^.]+)/);
+  results.projectRef = refMatch ? refMatch[1] : null;
 
   const fixed = results.pgStatus === 200;
+
+  if (!fixed) {
+    results.manualSql = SCHEMA_SQL.trim();
+    results.manualInstructions =
+      `Ve a https://supabase.com/dashboard/project/${results.projectRef}/sql/new y pega el SQL de arriba.`;
+  }
 
   return NextResponse.json(
     { status: fixed ? "ok" : "error", results },
