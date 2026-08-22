@@ -4,12 +4,20 @@ type Props = {
   appDeepLink: string;
   appStoreLink: string;
   playStoreLink: string;
+  /** Título del evento, o null cuando no se pudo resolver. */
+  eventTitle?: string | null;
+  /** "Sábado, 22 de agosto, 4:00 p. m. · Tegucigalpa". */
+  eventMeta?: string | null;
+  providerName?: string | null;
 };
 
 export function EventDownloadFallback({
   appDeepLink,
   appStoreLink,
   playStoreLink,
+  eventTitle = null,
+  eventMeta = null,
+  providerName = null,
 }: Props) {
   return (
     <main className="relative min-h-dvh overflow-hidden bg-[#050505] px-5 py-8 text-white sm:px-8">
@@ -23,9 +31,24 @@ export function EventDownloadFallback({
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-[#f67010]">
             Evento compartido
           </p>
+
+          {/* Con el evento resuelto se nombra; si no, se mantiene la invitación
+              genérica, que es lo único cierto en ese caso. */}
           <h1 className="mt-5 text-4xl font-semibold leading-[0.95] tracking-[-0.06em] text-white sm:text-6xl">
-            Abre este evento en Allons.
+            {eventTitle ?? "Abre este evento en Allons."}
           </h1>
+
+          {eventMeta ? (
+            <p className="mt-4 text-base font-medium tracking-tight text-white/75 sm:text-lg">
+              {eventMeta}
+            </p>
+          ) : null}
+          {providerName ? (
+            <p className="mt-1 text-sm tracking-tight text-white/50">
+              Organiza {providerName}
+            </p>
+          ) : null}
+
           <p className="mx-auto mt-5 max-w-md text-base leading-7 tracking-tight text-white/58 sm:text-lg">
             Si ya tienes la app, vuelve a intentar abrir el evento. Si aún no la
             tienes, descárgala y regresa a este enlace compartido.
