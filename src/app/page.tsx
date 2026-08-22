@@ -7,14 +7,14 @@ import { SocialProof } from "@/components/SocialProof";
 import { WaitlistForm } from "@/components/WaitlistForm";
 
 export const metadata: Metadata = {
-  title: "Lista de espera — Allons Honduras",
+  title: "Lista de espera Allons Honduras",
   description:
     "Únete a la lista de espera de Allons. Descubre, gestiona y entra a eventos en Honduras con una experiencia simple y elegante.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Allons — La próxima forma de vivir eventos",
+    title: "Allons La próxima forma de vivir eventos",
     description:
       "Regístrate en la lista de espera de Allons para acceder antes al lanzamiento en Honduras.",
     url: "https://allonsapp.com",
@@ -23,12 +23,12 @@ export const metadata: Metadata = {
         url: "https://allonsapp.com/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "Allons — Lista de espera",
+        alt: "Allons Lista de espera",
       },
     ],
   },
   twitter: {
-    title: "Allons — Lista de espera",
+    title: "Allons Lista de espera",
     description:
       "Acceso anticipado a la nueva experiencia de eventos en Honduras.",
     images: ["https://allonsapp.com/opengraph-image"],

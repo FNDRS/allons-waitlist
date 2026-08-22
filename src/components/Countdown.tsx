@@ -39,10 +39,10 @@ export function Countdown() {
   }, []);
 
   const segments = [
-    { label: "Días", value: timeLeft ? timeLeft.days.toString() : "--" },
-    { label: "Horas", value: timeLeft ? pad(timeLeft.hours) : "--" },
-    { label: "Minutos", value: timeLeft ? pad(timeLeft.minutes) : "--" },
-    { label: "Segundos", value: timeLeft ? pad(timeLeft.seconds) : "--" },
+    { label: "Días", value: timeLeft ? timeLeft.days.toString() : "00" },
+    { label: "Horas", value: timeLeft ? pad(timeLeft.hours) : "00" },
+    { label: "Minutos", value: timeLeft ? pad(timeLeft.minutes) : "00" },
+    { label: "Segundos", value: timeLeft ? pad(timeLeft.seconds) : "00" },
   ];
 
   return (

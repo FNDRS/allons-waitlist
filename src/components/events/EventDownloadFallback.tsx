@@ -2,7 +2,7 @@ import { AllonsLogo } from "@/components/AllonsLogo";
 
 type Props = {
   appDeepLink: string;
-  appStoreLink: string | null;
+  appStoreLink: string;
   playStoreLink: string;
 };
 
@@ -44,21 +44,13 @@ export function EventDownloadFallback({
             >
               Google Play
             </a>
-            {appStoreLink ? (
-              <a
-                href={appStoreLink}
-                className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/8 px-6 py-4 text-sm font-bold text-white transition hover:bg-white/12"
-              >
-                App Store
-              </a>
-            ) : null}
+            <a
+              href={appStoreLink}
+              className="inline-flex items-center justify-center rounded-full border border-white/12 bg-white/8 px-6 py-4 text-sm font-bold text-white transition hover:bg-white/12"
+            >
+              App Store
+            </a>
           </div>
-
-          {!appStoreLink ? (
-            <p className="mt-5 text-xs leading-5 text-white/42">
-              App Store se activará cuando la app esté publicada.
-            </p>
-          ) : null}
         </div>
       </section>
     </main>

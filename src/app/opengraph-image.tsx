@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Allons — Eventos sin fricción";
+export const alt = "Allons Eventos sin fricción";
 export const size = {
   width: 1200,
   height: 630,

@@ -19,8 +19,8 @@ export const metadata: Metadata = {
     telephone: false,
   },
   title: {
-    default: "Allons — Eventos sin fricción",
-    template: "%s — Allons",
+    default: "Allons Eventos sin fricción",
+    template: "%s Allons",
   },
   description:
     "Allons es la plataforma para gestionar, vender y controlar entradas de eventos en Honduras. Únete a la lista de espera.",
@@ -57,7 +57,7 @@ export const metadata: Metadata = {
     locale: "es_HN",
     url: SITE_URL,
     siteName: "Allons",
-    title: "Allons — Eventos sin fricción",
+    title: "Allons Eventos sin fricción",
     description:
       "Únete a la lista de espera. Próximamente en Honduras y Latinoamérica.",
     images: [
@@ -65,13 +65,13 @@ export const metadata: Metadata = {
         url: `${SITE_URL}/opengraph-image`,
         width: 1200,
         height: 630,
-        alt: "Allons — Eventos sin fricción",
+        alt: "Allons Eventos sin fricción",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Allons — Eventos sin fricción",
+    title: "Allons Eventos sin fricción",
     description: "Únete a la lista de espera.",
     images: [`${SITE_URL}/opengraph-image`],
   },

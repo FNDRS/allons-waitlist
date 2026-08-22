@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { EventDownloadFallback } from "@/components/events/EventDownloadFallback";
 
 const SITE_URL = "https://allonsapp.com";
+const DEFAULT_APP_STORE_LINK =
+  "https://apps.apple.com/us/app/allons-eventos-honduras/id6780532182?uo=4";
 const DEFAULT_PLAY_STORE_LINK =
   "https://play.google.com/store/apps/details?id=com.fndrs.allons";
 
@@ -14,8 +16,7 @@ function buildEventDeepLink(eventId: string) {
 }
 
 function getAppStoreLink() {
-  const link = process.env.APP_STORE_LINK?.trim();
-  return link || null;
+  return process.env.APP_STORE_LINK?.trim() || DEFAULT_APP_STORE_LINK;
 }
 
 function getPlayStoreLink() {
@@ -41,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
           url: `${SITE_URL}/opengraph-image`,
           width: 1200,
           height: 630,
-          alt: "Allons — Eventos sin fricción",
+          alt: "Allons Eventos sin fricción",
         },
       ],
     },

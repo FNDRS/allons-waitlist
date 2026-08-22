@@ -33,7 +33,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 Opcional para enlaces compartidos y App Links:
 
 ```
-APP_STORE_LINK=https://apps.apple.com/app/idXXXXXXXXX
+APP_STORE_LINK=https://apps.apple.com/us/app/allons-eventos-honduras/id6780532182?uo=4
 PLAY_STORE_LINK=https://play.google.com/store/apps/details?id=com.fndrs.allons
 ANDROID_PACKAGE_NAME=com.fndrs.allons
 ANDROID_SHA256_CERT_FINGERPRINTS=AA:BB:CC:DD:...

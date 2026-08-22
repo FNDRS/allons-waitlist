@@ -350,12 +350,16 @@ export function WaitlistForm({
               inputMode="tel"
               autoComplete="tel"
               enterKeyHint="send"
-              placeholder="+504 9999-9999"
+              placeholder="+504 9999 9999"
               value={phone}
               onChange={(e) => {
                 const digits = e.target.value.replace(/\D/g, "").slice(0, 8);
                 setPhoneRaw(digits);
-                setPhone(digits.length > 4 ? `${digits.slice(0, 4)}-${digits.slice(4)}` : digits);
+                setPhone(
+                  digits.length > 4
+                    ? `${digits.slice(0, 4)} ${digits.slice(4)}`
+                    : digits,
+                );
                 if (status === "error") {
                   setStatus("idle");
                   setErrorMsg(null);
