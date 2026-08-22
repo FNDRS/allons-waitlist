@@ -4,6 +4,7 @@ Landing page super minimalista para Allons.
 Negro, logo + un solo CTA → captura email → guarda en Supabase con atribución por QR.
 
 ## Stack
+
 - Next.js 15 (App Router)
 - React 19
 - Tailwind 4
@@ -29,6 +30,17 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 
 > El `SUPABASE_SERVICE_ROLE_KEY` solo se usa server-side en `/api/waitlist`. **Nunca** lo expongas con prefijo `NEXT_PUBLIC_`.
 
+Opcional para enlaces compartidos y App Links:
+
+```
+APP_STORE_LINK=https://apps.apple.com/app/idXXXXXXXXX
+PLAY_STORE_LINK=https://play.google.com/store/apps/details?id=com.fndrs.allons
+ANDROID_PACKAGE_NAME=com.fndrs.allons
+ANDROID_SHA256_CERT_FINGERPRINTS=AA:BB:CC:DD:...
+```
+
+`ANDROID_SHA256_CERT_FINGERPRINTS` debe salir de Google Play App Signing. Sin ese valor, `/.well-known/assetlinks.json` responde `[]` y Android no verificará los App Links.
+
 ### 2. Crear la tabla en Supabase
 
 Abre tu proyecto → **SQL Editor** → pega y corre `db/schema.sql`.
@@ -47,8 +59,18 @@ vercel link
 vercel env add NEXT_PUBLIC_SUPABASE_URL
 vercel env add NEXT_PUBLIC_SUPABASE_ANON_KEY
 vercel env add SUPABASE_SERVICE_ROLE_KEY
+vercel env add APP_STORE_LINK
+vercel env add PLAY_STORE_LINK
+vercel env add ANDROID_SHA256_CERT_FINGERPRINTS
 vercel --prod
 ```
+
+### 4. Enlaces compartidos y `.well-known`
+
+- `/events/{id}` muestra una página de respaldo para quien abre un evento compartido sin tener la app.
+- El botón principal intenta abrir `allons://events/{id}`.
+- `/.well-known/apple-app-site-association` habilita `/verify`, `/tickets` y `/events` para iOS.
+- `/.well-known/assetlinks.json` se genera desde `ANDROID_SHA256_CERT_FINGERPRINTS` para Android.
 
 ---
 
