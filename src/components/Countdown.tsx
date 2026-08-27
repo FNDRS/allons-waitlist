@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 
 // Launch in Honduras time (UTC-06:00).
-const LAUNCH_DATE = new Date("2026-10-09T19:00:00-06:00").getTime();
+const LAUNCH_DATE = new Date("2026-10-31T19:00:00-06:00").getTime();
 
 type TimeLeft = {
   days: number;
@@ -70,6 +70,10 @@ export function Countdown() {
         ))}
       </div>
 
+      <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-xs font-medium uppercase tracking-[0.18em] text-white/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] sm:text-[13px]">
+        <CalendarIcon />
+        Lanzamiento: 31 de octubre
+      </p>
     </section>
   );
 }
